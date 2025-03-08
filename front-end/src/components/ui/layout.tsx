@@ -7,8 +7,16 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb.tsx";
+import { useLocation } from "@tanstack/react-router";
+
+function capitalizeFirstLetter(val: string): string {
+  return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+}
 
 export default function Layout({ children }: { children: React.ReactNode }) {
+  const currentPagePath = useLocation().pathname;
+  const lastPage = currentPagePath.split("/").slice(-1)[0];
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -19,7 +27,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbPage>Homepage</BreadcrumbPage>
+                <BreadcrumbPage>
+                  {capitalizeFirstLetter(lastPage)}
+                </BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
