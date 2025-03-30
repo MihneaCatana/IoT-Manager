@@ -93,7 +93,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <a href="/register">
+            <a href="/register" onClick={() => localStorage.clear()}>
               <DropdownMenuItem>
                 <LogOut />
                 Log out

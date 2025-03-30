@@ -1,0 +1,10 @@
+########################################
+
+Prereq:
+
+- have node.js installed
+- have docker desktop open
+
+For starting the kafka containers, run command:
+
+- docker compose up -d

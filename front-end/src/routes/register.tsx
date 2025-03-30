@@ -25,6 +25,7 @@ function RouteComponent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log(isLogin ? "Login" : "Register", { email, password, username });
+    localStorage.setItem("JWT", "test");
     await navigate({ to: "/homepage" });
   };
 
