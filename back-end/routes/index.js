@@ -1,7 +1,11 @@
 import express from "express";
-import kafkaController from "../controller/kafkaController.js";
 const router = express.Router();
+import { KafkaRouter } from "./kafkaRouter.js";
+import { UserRouter } from "./userRouter.js";
+import { DeviceRouter } from "./deviceRouter.js";
 
-router.post("/send", kafkaController.sendMessageToKafka);
+router.use("/kafka", KafkaRouter);
+router.use("/user", UserRouter);
+router.use("/device", DeviceRouter);
 
 export default router;
