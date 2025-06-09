@@ -14,11 +14,6 @@ const deviceController = {
         name,
         type,
         owner: userId,
-        metadata: {
-          location: "Unknown",
-          ipAddress: null,
-          firmwareVersion: "v1.0.0",
-        },
       });
 
       const savedDevice = await newDevice.save();
@@ -33,9 +28,7 @@ const deviceController = {
   },
   getAll: async (req, res) => {
     try {
-      const userId = req.userId;
-
-      const devices = await Device.find({ owner: userId }).sort({
+      const devices = await Device.find().sort({
         createdAt: -1,
       });
 

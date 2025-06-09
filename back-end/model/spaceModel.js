@@ -1,0 +1,36 @@
+import mongoose from "mongoose";
+
+const spaceSchema = mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  description: {
+    type: String,
+    default: "",
+  },
+  location: {
+    type: String,
+    default: "",
+  },
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  devices: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Device",
+    },
+  ],
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+const Space = mongoose.model("Space", spaceSchema);
+
+export default Space;
