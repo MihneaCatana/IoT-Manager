@@ -17,7 +17,7 @@ import { VersionSwitcher } from "@/components/ui/version-switcher.tsx";
 import { NavUser } from "@/components/ui/nav-user.tsx";
 
 const data = {
-  versions: ["Main Hall"],
+  versions: ["Portal"],
   user: {
     name: "shadcn",
     email: "m@example.com",
@@ -25,15 +25,25 @@ const data = {
   },
   navMain: [
     {
+      title: "Portal",
+      url: "#",
+      items: [
+        {
+          title: "Dashboard",
+          url: "/dashboard",
+        },
+      ],
+    },
+    {
       title: "Devices",
       url: "#",
       items: [
         {
-          title: "Installation",
-          url: "#",
+          title: "Managed Devices",
+          url: "/devices",
         },
         {
-          title: "Project Structure",
+          title: "Unmanaged Devices",
           url: "#",
         },
       ],
@@ -71,7 +81,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarGroupContent>
               <SidebarMenu>
                 {item.items.map((item) => (
-                  <a href={item.url}>
+                  <a key={item.title.concat("_")} href={item.url}>
                     <SidebarMenuItem>
                       <SidebarMenuButton>{item.title}</SidebarMenuButton>
                     </SidebarMenuItem>

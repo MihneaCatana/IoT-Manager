@@ -26,7 +26,7 @@ function RouteComponent() {
     e.preventDefault();
     console.log(isLogin ? "Login" : "Register", { email, password, username });
     localStorage.setItem("JWT", "test");
-    await navigate({ to: "/homepage" });
+    await navigate({ to: "/dashboard" });
   };
 
   return (

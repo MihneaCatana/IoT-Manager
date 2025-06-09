@@ -11,13 +11,21 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as SpacesImport } from './routes/spaces'
 import { Route as RegisterImport } from './routes/register'
-import { Route as ProfileImport } from './routes/profile'
-import { Route as HomepageImport } from './routes/homepage'
+import { Route as DevicesImport } from './routes/devices'
+import { Route as DashboardImport } from './routes/dashboard'
+import { Route as BillingImport } from './routes/billing'
 import { Route as AccountImport } from './routes/account'
 import { Route as IndexImport } from './routes/index'
 
 // Create/Update Routes
+
+const SpacesRoute = SpacesImport.update({
+  id: '/spaces',
+  path: '/spaces',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const RegisterRoute = RegisterImport.update({
   id: '/register',
@@ -25,15 +33,21 @@ const RegisterRoute = RegisterImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const ProfileRoute = ProfileImport.update({
-  id: '/profile',
-  path: '/profile',
+const DevicesRoute = DevicesImport.update({
+  id: '/devices',
+  path: '/devices',
   getParentRoute: () => rootRoute,
 } as any)
 
-const HomepageRoute = HomepageImport.update({
-  id: '/homepage',
-  path: '/homepage',
+const DashboardRoute = DashboardImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const BillingRoute = BillingImport.update({
+  id: '/billing',
+  path: '/billing',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -67,18 +81,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountImport
       parentRoute: typeof rootRoute
     }
-    '/homepage': {
-      id: '/homepage'
-      path: '/homepage'
-      fullPath: '/homepage'
-      preLoaderRoute: typeof HomepageImport
+    '/billing': {
+      id: '/billing'
+      path: '/billing'
+      fullPath: '/billing'
+      preLoaderRoute: typeof BillingImport
       parentRoute: typeof rootRoute
     }
-    '/profile': {
-      id: '/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof ProfileImport
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardImport
+      parentRoute: typeof rootRoute
+    }
+    '/devices': {
+      id: '/devices'
+      path: '/devices'
+      fullPath: '/devices'
+      preLoaderRoute: typeof DevicesImport
       parentRoute: typeof rootRoute
     }
     '/register': {
@@ -86,6 +107,13 @@ declare module '@tanstack/react-router' {
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof RegisterImport
+      parentRoute: typeof rootRoute
+    }
+    '/spaces': {
+      id: '/spaces'
+      path: '/spaces'
+      fullPath: '/spaces'
+      preLoaderRoute: typeof SpacesImport
       parentRoute: typeof rootRoute
     }
   }
@@ -96,51 +124,83 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
-  '/homepage': typeof HomepageRoute
-  '/profile': typeof ProfileRoute
+  '/billing': typeof BillingRoute
+  '/dashboard': typeof DashboardRoute
+  '/devices': typeof DevicesRoute
   '/register': typeof RegisterRoute
+  '/spaces': typeof SpacesRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
-  '/homepage': typeof HomepageRoute
-  '/profile': typeof ProfileRoute
+  '/billing': typeof BillingRoute
+  '/dashboard': typeof DashboardRoute
+  '/devices': typeof DevicesRoute
   '/register': typeof RegisterRoute
+  '/spaces': typeof SpacesRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
-  '/homepage': typeof HomepageRoute
-  '/profile': typeof ProfileRoute
+  '/billing': typeof BillingRoute
+  '/dashboard': typeof DashboardRoute
+  '/devices': typeof DevicesRoute
   '/register': typeof RegisterRoute
+  '/spaces': typeof SpacesRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/account' | '/homepage' | '/profile' | '/register'
+  fullPaths:
+    | '/'
+    | '/account'
+    | '/billing'
+    | '/dashboard'
+    | '/devices'
+    | '/register'
+    | '/spaces'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/account' | '/homepage' | '/profile' | '/register'
-  id: '__root__' | '/' | '/account' | '/homepage' | '/profile' | '/register'
+  to:
+    | '/'
+    | '/account'
+    | '/billing'
+    | '/dashboard'
+    | '/devices'
+    | '/register'
+    | '/spaces'
+  id:
+    | '__root__'
+    | '/'
+    | '/account'
+    | '/billing'
+    | '/dashboard'
+    | '/devices'
+    | '/register'
+    | '/spaces'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccountRoute: typeof AccountRoute
-  HomepageRoute: typeof HomepageRoute
-  ProfileRoute: typeof ProfileRoute
+  BillingRoute: typeof BillingRoute
+  DashboardRoute: typeof DashboardRoute
+  DevicesRoute: typeof DevicesRoute
   RegisterRoute: typeof RegisterRoute
+  SpacesRoute: typeof SpacesRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountRoute: AccountRoute,
-  HomepageRoute: HomepageRoute,
-  ProfileRoute: ProfileRoute,
+  BillingRoute: BillingRoute,
+  DashboardRoute: DashboardRoute,
+  DevicesRoute: DevicesRoute,
   RegisterRoute: RegisterRoute,
+  SpacesRoute: SpacesRoute,
 }
 
 export const routeTree = rootRoute
@@ -155,9 +215,11 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/account",
-        "/homepage",
-        "/profile",
-        "/register"
+        "/billing",
+        "/dashboard",
+        "/devices",
+        "/register",
+        "/spaces"
       ]
     },
     "/": {
@@ -166,14 +228,20 @@ export const routeTree = rootRoute
     "/account": {
       "filePath": "account.tsx"
     },
-    "/homepage": {
-      "filePath": "homepage.tsx"
+    "/billing": {
+      "filePath": "billing.tsx"
     },
-    "/profile": {
-      "filePath": "profile.tsx"
+    "/dashboard": {
+      "filePath": "dashboard.tsx"
+    },
+    "/devices": {
+      "filePath": "devices.tsx"
     },
     "/register": {
       "filePath": "register.tsx"
+    },
+    "/spaces": {
+      "filePath": "spaces.tsx"
     }
   }
 }
