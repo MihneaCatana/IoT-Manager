@@ -19,8 +19,8 @@ import { NavUser } from "@/components/ui/nav-user.tsx";
 const data = {
   versions: ["Portal"],
   user: {
-    name: "shadcn",
-    email: "m@example.com",
+    name: "John Doe",
+    email: "johndoe@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
   navMain: [
@@ -39,12 +39,8 @@ const data = {
       url: "#",
       items: [
         {
-          title: "Managed Devices",
+          title: "Manage Devices",
           url: "/devices",
-        },
-        {
-          title: "Unmanaged Devices",
-          url: "#",
         },
       ],
     },
@@ -53,12 +49,8 @@ const data = {
       url: "/",
       items: [
         {
-          title: "View Spaces",
+          title: "Manage Spaces",
           url: "/spaces",
-        },
-        {
-          title: "Add Spaces",
-          url: "/add-spaces",
         },
       ],
     },

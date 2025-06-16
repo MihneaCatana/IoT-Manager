@@ -14,7 +14,6 @@ import {
   Home,
   Building,
   Factory,
-  Settings,
 } from "lucide-react";
 import {
   Card,
@@ -24,7 +23,6 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -242,7 +240,7 @@ function RouteComponent() {
         </div>
 
         {/* Overview Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 max-w-7xl">
           <Card>
             <CardContent className="p-4 flex flex-col items-center justify-center">
               <div className="text-2xl font-bold">{totalDevices}</div>
@@ -277,7 +275,7 @@ function RouteComponent() {
 
         {/* Spaces as Cards */}
         <h2 className="text-xl font-semibold mb-4">Spaces</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 max-w-7xl">
           {spaces.map((space) => {
             const SpaceIcon = space.icon;
             const isSelected = selectedSpace.id === space.id;
@@ -341,7 +339,7 @@ function RouteComponent() {
 
           <TabsContent value="devices" className="space-y-6">
             {/* Device Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 max-w-7xl">
               {selectedSpace.devices.map((device) => {
                 const DeviceIcon = device.icon;
                 return (
@@ -396,7 +394,7 @@ function RouteComponent() {
           </TabsContent>
 
           <TabsContent value="analytics" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-7xl">
               {/* Temperature Chart */}
               <Card>
                 <CardHeader>
