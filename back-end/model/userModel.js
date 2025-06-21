@@ -8,6 +8,21 @@ const userSchema = mongoose.Schema({
     trim: true,
     minlength: 3,
   },
+  firstName: {
+    type: String,
+    trim: true,
+    default: "",
+  },
+  lastName: {
+    type: String,
+    trim: true,
+    default: "",
+  },
+  location: {
+    type: String,
+    trim: true,
+    default: "Bucharest, RO",
+  },
   email: {
     type: String,
     required: true,

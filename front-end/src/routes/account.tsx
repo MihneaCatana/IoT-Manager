@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import Layout from "@/components/ui/layout.tsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,19 +13,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Camera, MapPin, Mail, User } from "lucide-react";
+import axios from "axios";
+import { UserProfile } from "@/interfaces/user";
 
 export const Route = createFileRoute("/account")({
   component: RouteComponent,
 });
-
-interface UserProfile {
-  username: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  location: string;
-  profileImage: string;
-}
 
 function RouteComponent() {
   const [profile, setProfile] = useState<UserProfile>({
@@ -44,10 +37,24 @@ function RouteComponent() {
   };
 
   const handleSave = () => {
-    // Here you would typically save to your backend
     console.log("Saving profile:", profile);
-    setIsEditing(false);
+    const id = localStorage.getItem("id");
+    axios.put(`http://localhost:8080/api/user/${id}`, profile).then(() => {
+      setIsEditing(false);
+    });
   };
+
+  useEffect(() => {
+    const id = localStorage.getItem("id");
+
+    axios.get(`http://localhost:8080/api/user/${id}`).then((res) => {
+      console.log(res.data);
+      setProfile({
+        ...res.data,
+        profileImage: "/placeholder.svg?height=120&width=120",
+      });
+    });
+  }, []);
 
   return (
     <Layout>

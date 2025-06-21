@@ -15,13 +15,15 @@ import {
 } from "@/components/ui/sidebar";
 import { VersionSwitcher } from "@/components/ui/version-switcher.tsx";
 import { NavUser } from "@/components/ui/nav-user.tsx";
+import axios from "axios";
+import { UserProfile } from "@/interfaces/user";
 
 const data = {
   versions: ["Portal"],
   user: {
     name: "John Doe",
     email: "johndoe@example.com",
-    avatar: "/avatars/shadcn.jpg",
+    profileImage: "/avatars/shadcn.jpg",
   },
   navMain: [
     {
@@ -58,6 +60,26 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const [user, setUser] = React.useState<UserProfile>({
+    username: "johndoe",
+    email: "john.doe@example.com",
+    firstName: "John",
+    lastName: "Doe",
+    location: "San Francisco, CA",
+    profileImage: "/placeholder.svg?height=120&width=120",
+  });
+
+  React.useEffect(() => {
+    const id = localStorage.getItem("id");
+
+    axios.get(`http://localhost:8080/api/user/${id}`).then((res) => {
+      setUser({
+        ...res.data,
+        profileImage: "/placeholder.svg?height=120&width=120",
+      });
+    });
+  }, []);
+
   return (
     <Sidebar {...props}>
       <SidebarHeader>
@@ -86,7 +108,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarRail />
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
     </Sidebar>
   );

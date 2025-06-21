@@ -29,8 +29,23 @@ const userController = {
         password: hashedPassword,
       });
 
+      // Generate JWT token
+      const token = jwt.sign(
+        { userId: newUser._id, email: newUser.email },
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" }
+      );
+
       await newUser.save();
-      res.status(201).json({ message: "User created successfully" });
+      res.status(201).json({
+        message: "User created successfully",
+        token,
+        user: {
+          id: newUser._id,
+          username: newUser.username,
+          email: newUser.email,
+        },
+      });
     } catch (error) {
       console.error("User registration error:", err);
       res.status(500).json({ message: "Server error" });
@@ -69,6 +84,43 @@ const userController = {
       });
     } catch (error) {
       console.error("Login error:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  },
+
+  getUser: async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      const user = await User.findOne({ _id: id });
+
+      if (user) {
+        return res.status(200).json(user);
+      } else return res.status(404).json({ message: "User not found" });
+    } catch (error) {
+      console.error("Error:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  },
+
+  updateUser: async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      const { firstName, lastName, username, email, location } = req.body;
+
+      const user = await User.findOne({ _id: id });
+
+      if (user) {
+        const updatedUser = await User.findByIdAndUpdate(
+          id,
+          { firstName, lastName, username, email, location },
+          { new: true }
+        );
+        return res.status(200).json(updatedUser);
+      } else return res.status(404).json({ message: "User not found" });
+    } catch (error) {
+      console.error("Error:", error);
       res.status(500).json({ message: "Server error" });
     }
   },
