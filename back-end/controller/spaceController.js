@@ -3,7 +3,7 @@ import Space from "../model/spaceModel.js";
 const spaceController = {
   create: async (req, res) => {
     try {
-      const { name, userId, devices } = req.body;
+      const { name, userId } = req.body;
 
       // Validate required fields
       if (!name) {
@@ -13,13 +13,13 @@ const spaceController = {
       const newSpace = new Space({
         name,
         owner: userId,
-        devices,
+        devices: [],
       });
 
       const savedSpace = await newSpace.save();
       res.status(201).json({
-        message: "Device registered successfully",
-        device: savedSpace,
+        message: "Space registered successfully",
+        space: savedSpace,
       });
     } catch (error) {
       console.error("Error creating space:", error);

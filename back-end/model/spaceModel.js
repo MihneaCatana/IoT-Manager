@@ -6,10 +6,6 @@ const spaceSchema = mongoose.Schema({
     required: true,
     trim: true,
   },
-  description: {
-    type: String,
-    default: "",
-  },
   location: {
     type: String,
     default: "",
