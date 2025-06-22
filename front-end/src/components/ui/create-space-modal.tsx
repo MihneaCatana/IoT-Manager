@@ -20,14 +20,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-
-interface Space {
-  name: string;
-  type: "smart-home" | "factory" | "warehouse";
-  location: string;
-  devices: any[];
-  status: "active" | "inactive" | "maintenance";
-}
+import { Space } from "@/interfaces/space";
+import { ToastContainer, toast } from "react-toastify";
+import axios from "axios";
 
 interface CreateSpaceModalProps {
   isOpen: boolean;
@@ -51,17 +46,37 @@ export function CreateSpaceModal({
     e.preventDefault();
     if (!formData.name || !formData.type || !formData.location) return;
 
+    const userId = localStorage.getItem('id');
+
     const newSpace: Space = {
+      _id:'',
       name: formData.name,
       type: formData.type as "smart-home" | "factory" | "warehouse",
       location: formData.location,
       devices: [],
+      owner:userId as string,
       status: "active",
     };
 
+    axios.post("http://localhost:8080/api/space", newSpace).then(()=>{
     onCreateSpace(newSpace);
     setFormData({ name: "", type: "", location: "", description: "" });
     onClose();
+    }).catch((err)=>{
+      console.log(err);
+      toast.error("Space couldn't be added!", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+              });
+    })
+
+
   };
 
   const handleClose = () => {
@@ -148,6 +163,7 @@ export function CreateSpaceModal({
           </DialogFooter>
         </form>
       </DialogContent>
+      <ToastContainer />
     </Dialog>
   );
 }

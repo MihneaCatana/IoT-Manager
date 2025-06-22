@@ -29,6 +29,8 @@ import { Plus, Edit, Trash2, Home, Factory, Warehouse } from "lucide-react";
 import { AddDeviceModal } from "@/components/ui/add-device-modal";
 import { Device } from "@/interfaces/device";
 import { Space } from "@/interfaces/space";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
 
 interface SpaceDetailsModalProps {
   isOpen: boolean;
@@ -100,8 +102,23 @@ export function SpaceDetailsModal({
   };
 
   const handleUpdateSpaceInfo = () => {
+    
+    axios.put(`http://localhost:8080/api/space/${spaceData._id}`,spaceData).then(()=>{
     onUpdateSpace(spaceData);
     setEditingSpace(false);
+    }).catch((err)=>{
+      console.log(err)
+              toast.error("Space couldn't be updated!", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+              });
+    })
   };
 
   return (
@@ -170,7 +187,7 @@ export function SpaceDetailsModal({
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Created:</span>
-                    <span className="font-medium">{spaceData.createdAt}</span>
+                    <span className="font-medium">{spaceData.createdAt!.split('T')[0]}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Status:</span>
@@ -314,6 +331,7 @@ export function SpaceDetailsModal({
           </Tabs>
         </DialogContent>
       </Dialog>
+      <ToastContainer />
 
       <AddDeviceModal
         isOpen={isAddDeviceModalOpen}

@@ -3,7 +3,7 @@ import Space from "../model/spaceModel.js";
 const spaceController = {
   create: async (req, res) => {
     try {
-      const { name,location, userId } = req.body;
+      const { name,location,type, owner } = req.body;
 
       // Validate required fields
       if (!name) {
@@ -13,7 +13,8 @@ const spaceController = {
       const newSpace = new Space({
         name,
         location,
-        owner: userId,
+        type,
+        owner,
         devices: [],
       });
 
@@ -83,6 +84,14 @@ const spaceController = {
       res.status(500).json({ message: "Server error" });
     }
   },
+  // addDevice: async (req, res) =>{
+  //   try {
+      
+  //   } catch (error) {
+  //     console.error("Error fetching spaces:", error);
+  //     res.status(500).json({ message: "Server error" });
+  //   }
+  // }
 };
 
 export default spaceController;

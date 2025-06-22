@@ -22,106 +22,11 @@ import { SpaceDetailsModal } from "@/components/ui/space-details-modal";
 import { CreateSpaceModal } from "@/components/ui/create-space-modal";
 import axios from "axios";
 import { Space } from "@/interfaces/space";
+import { ToastContainer, toast } from "react-toastify";
 
 export const Route = createFileRoute("/spaces")({
   component: RouteComponent,
 });
-
-const initialSpaces: Space[] = [
-  {
-    _id: "1",
-    name: "Main Production Floor",
-    type: "factory",
-    location: "Building A, Floor 2",
-    status: "active",
-    createdAt: "2024-01-15",
-    devices: [
-      {
-        id: "1",
-        name: "Conveyor Belt 1",
-        type: "Machinery",
-        status: "online",
-        location: "Section A",
-      },
-      {
-        id: "2",
-        name: "Temperature Sensor",
-        type: "Sensor",
-        status: "online",
-        location: "Section B",
-      },
-      {
-        id: "3",
-        name: "Safety Camera",
-        type: "Security",
-        status: "offline",
-        location: "Section C",
-      },
-    ],
-  },
-  {
-    _id: "2",
-    name: "Smart Home Office",
-    type: "smart-home",
-    location: "123 Tech Street",
-    status: "active",
-    createdAt: "2024-02-01",
-    devices: [
-      {
-        id: "4",
-        name: "Smart Thermostat",
-        type: "Climate",
-        status: "online",
-        location: "Living Room",
-      },
-      {
-        id: "5",
-        name: "Security System",
-        type: "Security",
-        status: "online",
-        location: "Main Entrance",
-      },
-      {
-        id: "6",
-        name: "Smart Lights",
-        type: "Lighting",
-        status: "online",
-        location: "Office",
-      },
-    ],
-  },
-  {
-    _id: "3",
-    name: "Central Warehouse",
-    type: "warehouse",
-    location: "Distribution Center 1",
-    status: "active",
-    createdAt: "2024-01-20",
-    devices: [
-      {
-        id: "7",
-        name: "Inventory Scanner",
-        type: "Scanner",
-        status: "online",
-        location: "Aisle 1",
-      },
-      {
-        id: "8",
-        name: "Climate Control",
-        type: "Climate",
-        status: "maintenance",
-        location: "Zone A",
-      },
-      {
-        id: "9",
-        name: "Loading Dock Sensor",
-        type: "Sensor",
-        status: "online",
-        location: "Dock 3",
-      },
-    ],
-  },
-];
 
 function RouteComponent() {
   const [spaces, setSpaces] = useState<Space[]>([]);
@@ -191,13 +96,26 @@ function RouteComponent() {
     (space) => space.status === "active"
   ).length;
 
-  useEffect(()=>{
-
-    axios.get('http://localhost:8080/api/space').then((res)=>{
-      setSpaces(res.data.spaces)
-    })
-
-  },[])
+  useEffect(() => {
+    axios
+      .get("http://localhost:8080/api/space")
+      .then((res) => {
+        setSpaces(res.data.spaces);
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Space couldn't be fetched!", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: false,
+          progress: undefined,
+          theme: "light",
+        });
+      });
+  }, []);
 
   return (
     <Layout>
@@ -332,7 +250,9 @@ function RouteComponent() {
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Created:</span>
-                      <span className="font-medium">{space.createdAt.split('T')[0]}</span>
+                      <span className="font-medium">
+                        {space.createdAt!.split("T")[0]}
+                      </span>
                     </div>
                   </div>
                 </CardContent>
@@ -357,6 +277,7 @@ function RouteComponent() {
           )}
         </div>
       </div>
+      <ToastContainer />
     </Layout>
   );
 }

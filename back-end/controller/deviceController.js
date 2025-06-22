@@ -1,10 +1,9 @@
 import Device from "../model/deviceModel.js";
-import User from "../model/userModel.js";
 
 const deviceController = {
   create: async (req, res) => {
     try {
-      const { name, type, userId } = req.body;
+      const { name, type, userId, space } = req.body;
 
       // Validate required fields
       if (!name || !type) {
@@ -13,6 +12,7 @@ const deviceController = {
 
       const newDevice = new Device({
         name,
+        space,
         type,
         owner: userId,
       });
@@ -63,7 +63,7 @@ const deviceController = {
   updateOne: async (req, res) => {
     try {
       const deviceId = req.params.id;
-      const { status, name, temperature, batteryLevel } = req.body;
+      const { status, name, temperature, batteryLevel, space } = req.body;
 
       const device = Device.findOne({ _id: deviceId });
 
@@ -75,7 +75,7 @@ const deviceController = {
 
       const updatedDevice = await Device.findByIdAndUpdate(
         deviceId,
-        { name, status, temperature, batteryLevel },
+        { name, status, temperature, batteryLevel, space },
         { new: true }
       );
 

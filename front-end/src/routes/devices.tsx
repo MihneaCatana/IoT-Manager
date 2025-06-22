@@ -51,6 +51,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
+import { Space } from "@/interfaces/space";
 
 export const Route = createFileRoute("/devices")({
   component: RouteComponent,
@@ -61,7 +62,7 @@ interface IoTDevice {
   name: string;
   type: "sensor" | "actuator" | "gateway" | "camera" | "thermostat";
   status: "online" | "offline" | "maintenance";
-  location: string;
+  space: string;
   lastSeen: Date;
   batteryLevel?: number;
   temperature?: number;
@@ -70,68 +71,11 @@ interface IoTDevice {
   firmware: string;
 }
 
-const initialDevices: IoTDevice[] = [
-  {
-    _id: "dev-001",
-    name: "Temperature Sensor A1",
-    type: "sensor",
-    status: "online",
-    location: "Building A - Floor 1",
-    lastSeen: new Date(Date.now() - 5 * 60 * 1000),
-    batteryLevel: 85,
-    temperature: 22.5,
-    humidity: 45,
-    firmware: "v2.1.3",
-  },
-  {
-    _id: "dev-002",
-    name: "Smart Thermostat B2",
-    type: "thermostat",
-    status: "online",
-    location: "Building B - Floor 2",
-    lastSeen: new Date(Date.now() - 2 * 60 * 1000),
-    temperature: 24.0,
-    powerConsumption: 15.2,
-    firmware: "v1.8.1",
-  },
-  {
-    _id: "dev-003",
-    name: "Security Camera C1",
-    type: "camera",
-    status: "offline",
-    location: "Building C - Entrance",
-    lastSeen: new Date(Date.now() - 45 * 60 * 1000),
-    powerConsumption: 8.7,
-    firmware: "v3.2.0",
-  },
-  {
-    _id: "dev-004",
-    name: "IoT Gateway Main",
-    type: "gateway",
-    status: "online",
-    location: "Data Center",
-    lastSeen: new Date(Date.now() - 1 * 60 * 1000),
-    powerConsumption: 25.8,
-    firmware: "v4.1.2",
-  },
-  {
-    _id: "dev-005",
-    name: "Humidity Sensor D3",
-    type: "sensor",
-    status: "maintenance",
-    location: "Building D - Floor 3",
-    lastSeen: new Date(Date.now() - 120 * 60 * 1000),
-    batteryLevel: 12,
-    humidity: 38,
-    firmware: "v2.0.8",
-  },
-];
-
 const defaultValuesNewDevice: Partial<IoTDevice> = {
   name: "",
   type: "sensor",
   status: "offline",
-  location: "",
+  space: undefined,
   firmware: "v1.0.0",
 };
 
@@ -146,6 +90,7 @@ function RouteComponent() {
   const [newDevice, setNewDevice] = useState<Partial<IoTDevice>>(
     defaultValuesNewDevice
   );
+  const [spaces, setSpaces] = useState<Space[]>([]);
 
   const filteredDevices = devices.filter((device) => {
     const matchesSearch = device.name
@@ -158,12 +103,13 @@ function RouteComponent() {
   });
 
   const handleAddDevice = () => {
-    if (newDevice.name && newDevice.location) {
+    if (newDevice.name && newDevice.space) {
       const userid = localStorage.getItem("id");
       axios
         .post("http://localhost:8080/api/device", {
           name: newDevice.name,
           type: newDevice.type,
+          space: newDevice.space,
           userId: userid,
         })
         .then((res) => {
@@ -181,8 +127,12 @@ function RouteComponent() {
   const handleUpdateDevice = () => {
     if (editingDevice) {
       axios
-        .put(`http://localhost:8080/api/device/${editingDevice._id}`)
-        .then(() => {
+        .put(
+          `http://localhost:8080/api/device/${editingDevice._id}`,
+          editingDevice
+        )
+        .then((res) => {
+          console.log(res.data);
           setDevices(
             devices.map((d) =>
               d._id === editingDevice._id ? editingDevice : d
@@ -258,23 +208,44 @@ function RouteComponent() {
     }
   };
 
-  const formatLastSeen = (date: Date) => {
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-
-    if (diffMins < 1) return "Just now";
-    if (diffMins < 60) return `${diffMins}m ago`;
-    const diffHours = Math.floor(diffMins / 60);
-    if (diffHours < 24) return `${diffHours}h ago`;
-    const diffDays = Math.floor(diffHours / 24);
-    return `${diffDays}d ago`;
-  };
-
   useEffect(() => {
-    axios.get("http://localhost:8080/api/device/").then((res) => {
-      setDevices(res.data.devices);
-    });
+    axios
+      .get("http://localhost:8080/api/device/")
+      .then((res) => {
+        setDevices(res.data.devices);
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Devices couldn't be fetched!", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: false,
+          progress: undefined,
+          theme: "light",
+        });
+      });
+
+    axios
+      .get("http://localhost:8080/api/space")
+      .then((res) => {
+        setSpaces(res.data.spaces);
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Space couldn't be fetched!", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: false,
+          progress: undefined,
+          theme: "light",
+        });
+      });
   }, []);
 
   return (
@@ -287,7 +258,7 @@ function RouteComponent() {
               IoT Device Management
             </h1>
             <p className="text-gray-600">
-              Monitor and manage your IoT devices across all locations
+              Monitor and manage your IoT devices across all spaces
             </p>
           </div>
 
@@ -435,15 +406,29 @@ function RouteComponent() {
                     </Select>
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="location">Location</Label>
-                    <Input
-                      id="location"
-                      value={newDevice.location}
-                      onChange={(e) =>
-                        setNewDevice({ ...newDevice, location: e.target.value })
+                    <Label htmlFor="type">Space</Label>
+                    <Select
+                      value={newDevice.space}
+                      onValueChange={(value) =>
+                        setNewDevice({
+                          ...newDevice,
+                          space: value,
+                        })
                       }
-                      placeholder="Enter device location"
-                    />
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {spaces.map((space: Space) => {
+                          return (
+                            <SelectItem key={space._id} value={space._id}>
+                              {space.name}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="firmware">Firmware Version</Label>
@@ -523,8 +508,14 @@ function RouteComponent() {
                 <CardContent>
                   <div className="space-y-3">
                     <div>
-                      <p className="text-sm text-gray-600">Location</p>
-                      <p className="font-medium">{device.location}</p>
+                      <p className="text-sm text-gray-600">Space</p>
+                      <p className="font-medium">
+                        {
+                          spaces.filter(
+                            (space: Space) => space._id === device.space
+                          )[0]?.name
+                        }
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Last Seen</p>
@@ -636,17 +627,29 @@ function RouteComponent() {
                     </Select>
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="edit-location">Location</Label>
-                    <Input
-                      id="edit-location"
-                      value={editingDevice.location}
-                      onChange={(e) =>
+                    <Label htmlFor="type">Space</Label>
+                    <Select
+                      value={editingDevice.space}
+                      onValueChange={(value) =>
                         setEditingDevice({
                           ...editingDevice,
-                          location: e.target.value,
+                          space: value,
                         })
                       }
-                    />
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {spaces.map((space: Space) => {
+                          return (
+                            <SelectItem key={space._id} value={space._id}>
+                              {space.name}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
                   </div>
                   {editingDevice.batteryLevel !== undefined && (
                     <div className="grid gap-2">

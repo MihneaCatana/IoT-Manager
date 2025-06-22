@@ -6,6 +6,7 @@ export interface Space {
     type: "smart-home" | "factory" | "warehouse";
     location: string;
     devices: Device[];
+    owner?: string;
     status: "active" | "inactive" | "maintenance";
-    createdAt: string;
+    createdAt?: string;
   }
