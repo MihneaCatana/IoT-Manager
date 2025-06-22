@@ -12,11 +12,13 @@ const spaceSchema = mongoose.Schema({
   },
   type: {
     type: String,
-    default: "",
+    enum:['smart-home', 'factory','warehouse'],
+    default: "smart-home",
   },
   status: {
     type: String,
-    default: "Inactive",
+    enum:['inactive', 'active', 'maintenance'],
+    default: "inactive",
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,

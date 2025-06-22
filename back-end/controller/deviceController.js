@@ -43,7 +43,7 @@ const deviceController = {
   getOne: async (req, res) => {
     try {
       const deviceId = req.params.id;
-      const userId = req.user.userId;
+      const userId = req.params.userId;
 
       const device = await Device.findOne({ _id: deviceId, owner: userId });
 
@@ -65,7 +65,7 @@ const deviceController = {
       const deviceId = req.params.id;
       const { status, name, temperature, batteryLevel } = req.body;
 
-      const device = User.findOne({ _id: deviceId });
+      const device = Device.findOne({ _id: deviceId });
 
       if (!device) {
         return res

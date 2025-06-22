@@ -27,24 +27,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Edit, Trash2, Home, Factory, Warehouse } from "lucide-react";
 import { AddDeviceModal } from "@/components/ui/add-device-modal";
-
-interface Device {
-  id: string;
-  name: string;
-  type: string;
-  status: "online" | "offline" | "maintenance";
-  location: string;
-}
-
-interface Space {
-  id: string;
-  name: string;
-  type: "smart-home" | "factory" | "warehouse";
-  location: string;
-  devices: Device[];
-  status: "active" | "inactive" | "maintenance";
-  createdAt: string;
-}
+import { Device } from "@/interfaces/device";
+import { Space } from "@/interfaces/space";
 
 interface SpaceDetailsModalProps {
   isOpen: boolean;

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import Layout from "@/components/ui/layout.tsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Plus,
   Home,
@@ -20,32 +20,16 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { SpaceDetailsModal } from "@/components/ui/space-details-modal";
 import { CreateSpaceModal } from "@/components/ui/create-space-modal";
+import axios from "axios";
+import { Space } from "@/interfaces/space";
 
 export const Route = createFileRoute("/spaces")({
   component: RouteComponent,
 });
 
-interface Device {
-  id: string;
-  name: string;
-  type: string;
-  status: "online" | "offline" | "maintenance";
-  location: string;
-}
-
-interface Space {
-  id: string;
-  name: string;
-  type: "smart-home" | "factory" | "warehouse";
-  location: string;
-  devices: Device[];
-  status: "active" | "inactive" | "maintenance";
-  createdAt: string;
-}
-
 const initialSpaces: Space[] = [
   {
-    id: "1",
+    _id: "1",
     name: "Main Production Floor",
     type: "factory",
     location: "Building A, Floor 2",
@@ -76,7 +60,7 @@ const initialSpaces: Space[] = [
     ],
   },
   {
-    id: "2",
+    _id: "2",
     name: "Smart Home Office",
     type: "smart-home",
     location: "123 Tech Street",
@@ -107,7 +91,7 @@ const initialSpaces: Space[] = [
     ],
   },
   {
-    id: "3",
+    _id: "3",
     name: "Central Warehouse",
     type: "warehouse",
     location: "Distribution Center 1",
@@ -140,7 +124,7 @@ const initialSpaces: Space[] = [
 ];
 
 function RouteComponent() {
-  const [spaces, setSpaces] = useState<Space[]>(initialSpaces);
+  const [spaces, setSpaces] = useState<Space[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedSpace, setSelectedSpace] = useState<Space | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
@@ -171,10 +155,10 @@ function RouteComponent() {
     }
   };
 
-  const handleCreateSpace = (newSpace: Omit<Space, "id" | "createdAt">) => {
+  const handleCreateSpace = (newSpace: Omit<Space, "_id" | "createdAt">) => {
     const space: Space = {
       ...newSpace,
-      id: Date.now().toString(),
+      _id: Date.now().toString(),
       createdAt: new Date().toISOString().split("T")[0],
     };
     setSpaces([...spaces, space]);
@@ -183,7 +167,7 @@ function RouteComponent() {
   const handleUpdateSpace = (updatedSpace: Space) => {
     setSpaces(
       spaces.map((space) =>
-        space.id === updatedSpace.id ? updatedSpace : space
+        space._id === updatedSpace._id ? updatedSpace : space
       )
     );
   };
@@ -206,6 +190,14 @@ function RouteComponent() {
   const activeSpaces = spaces.filter(
     (space) => space.status === "active"
   ).length;
+
+  useEffect(()=>{
+
+    axios.get('http://localhost:8080/api/space').then((res)=>{
+      setSpaces(res.data.spaces)
+    })
+
+  },[])
 
   return (
     <Layout>
@@ -299,7 +291,7 @@ function RouteComponent() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {spaces.map((space) => (
               <Card
-                key={space.id}
+                key={space._id}
                 className="cursor-pointer hover:shadow-lg transition-shadow"
                 onClick={() => handleSpaceClick(space)}
               >
@@ -340,7 +332,7 @@ function RouteComponent() {
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Created:</span>
-                      <span className="font-medium">{space.createdAt}</span>
+                      <span className="font-medium">{space.createdAt.split('T')[0]}</span>
                     </div>
                   </div>
                 </CardContent>
