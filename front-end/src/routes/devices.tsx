@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import Layout from "@/components/ui/layout.tsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Plus,
   Search,
@@ -49,13 +49,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
 
 export const Route = createFileRoute("/devices")({
   component: RouteComponent,
 });
 
 interface IoTDevice {
-  id: string;
+  _id: string;
   name: string;
   type: "sensor" | "actuator" | "gateway" | "camera" | "thermostat";
   status: "online" | "offline" | "maintenance";
@@ -70,7 +72,7 @@ interface IoTDevice {
 
 const initialDevices: IoTDevice[] = [
   {
-    id: "dev-001",
+    _id: "dev-001",
     name: "Temperature Sensor A1",
     type: "sensor",
     status: "online",
@@ -82,7 +84,7 @@ const initialDevices: IoTDevice[] = [
     firmware: "v2.1.3",
   },
   {
-    id: "dev-002",
+    _id: "dev-002",
     name: "Smart Thermostat B2",
     type: "thermostat",
     status: "online",
@@ -93,7 +95,7 @@ const initialDevices: IoTDevice[] = [
     firmware: "v1.8.1",
   },
   {
-    id: "dev-003",
+    _id: "dev-003",
     name: "Security Camera C1",
     type: "camera",
     status: "offline",
@@ -103,7 +105,7 @@ const initialDevices: IoTDevice[] = [
     firmware: "v3.2.0",
   },
   {
-    id: "dev-004",
+    _id: "dev-004",
     name: "IoT Gateway Main",
     type: "gateway",
     status: "online",
@@ -113,7 +115,7 @@ const initialDevices: IoTDevice[] = [
     firmware: "v4.1.2",
   },
   {
-    id: "dev-005",
+    _id: "dev-005",
     name: "Humidity Sensor D3",
     type: "sensor",
     status: "maintenance",
@@ -125,26 +127,30 @@ const initialDevices: IoTDevice[] = [
   },
 ];
 
+const defaultValuesNewDevice: Partial<IoTDevice> = {
+  name: "",
+  type: "sensor",
+  status: "offline",
+  location: "",
+  firmware: "v1.0.0",
+};
+
 function RouteComponent() {
-  const [devices, setDevices] = useState<IoTDevice[]>(initialDevices);
+  const [devices, setDevices] = useState<IoTDevice[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterType, setFilterType] = useState<string>("all");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingDevice, setEditingDevice] = useState<IoTDevice | null>(null);
   const [deviceToDelete, setDeviceToDelete] = useState<string | null>(null);
-  const [newDevice, setNewDevice] = useState<Partial<IoTDevice>>({
-    name: "",
-    type: "sensor",
-    status: "offline",
-    location: "",
-    firmware: "v1.0.0",
-  });
+  const [newDevice, setNewDevice] = useState<Partial<IoTDevice>>(
+    defaultValuesNewDevice
+  );
 
   const filteredDevices = devices.filter((device) => {
-    const matchesSearch =
-      device.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      device.location.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = device.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
     const matchesStatus =
       filterStatus === "all" || device.status === filterStatus;
     const matchesType = filterType === "all" || device.type === filterType;
@@ -153,27 +159,18 @@ function RouteComponent() {
 
   const handleAddDevice = () => {
     if (newDevice.name && newDevice.location) {
-      const device: IoTDevice = {
-        id: `dev-${Date.now().toString().slice(-3)}`,
-        name: newDevice.name,
-        type: newDevice.type as IoTDevice["type"],
-        status: newDevice.status as IoTDevice["status"],
-        location: newDevice.location,
-        lastSeen: new Date(),
-        firmware: newDevice.firmware || "v1.0.0",
-        ...(newDevice.type === "sensor" && { batteryLevel: 100 }),
-        ...(newDevice.type === "sensor" && { temperature: 20, humidity: 50 }),
-        ...(newDevice.type !== "sensor" && { powerConsumption: 10 }),
-      };
-      setDevices([...devices, device]);
-      setNewDevice({
-        name: "",
-        type: "sensor",
-        status: "offline",
-        location: "",
-        firmware: "v1.0.0",
-      });
-      setIsAddDialogOpen(false);
+      const userid = localStorage.getItem("id");
+      axios
+        .post("http://localhost:8080/api/device", {
+          name: newDevice.name,
+          type: newDevice.type,
+          userId: userid,
+        })
+        .then((res) => {
+          setDevices([...devices, res.data.device]);
+          setNewDevice(defaultValuesNewDevice);
+          setIsAddDialogOpen(false);
+        });
     }
   };
 
@@ -183,16 +180,52 @@ function RouteComponent() {
 
   const handleUpdateDevice = () => {
     if (editingDevice) {
-      setDevices(
-        devices.map((d) => (d.id === editingDevice.id ? editingDevice : d))
-      );
-      setEditingDevice(null);
+      axios
+        .put(`http://localhost:8080/api/device/${editingDevice._id}`)
+        .then(() => {
+          setDevices(
+            devices.map((d) =>
+              d._id === editingDevice._id ? editingDevice : d
+            )
+          );
+          setEditingDevice(null);
+        })
+        .catch((err) => {
+          console.log(err);
+          toast.error("Device couldn't be updated!", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: false,
+            progress: undefined,
+            theme: "light",
+          });
+        });
     }
   };
 
   const handleDeleteDevice = (deviceId: string) => {
-    setDevices(devices.filter((d) => d.id !== deviceId));
-    setDeviceToDelete(null);
+    axios
+      .delete(`http://localhost:8080/api/device/${deviceId}`)
+      .then(() => {
+        setDevices(devices.filter((d) => d._id !== deviceId));
+        setDeviceToDelete(null);
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Device couldn't be deleted!", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: false,
+          progress: undefined,
+          theme: "light",
+        });
+      });
   };
 
   const getStatusColor = (status: string) => {
@@ -237,6 +270,12 @@ function RouteComponent() {
     const diffDays = Math.floor(diffHours / 24);
     return `${diffDays}d ago`;
   };
+
+  useEffect(() => {
+    axios.get("http://localhost:8080/api/device/").then((res) => {
+      setDevices(res.data.devices);
+    });
+  }, []);
 
   return (
     <Layout>
@@ -347,6 +386,8 @@ function RouteComponent() {
                 <SelectItem value="thermostat">Thermostat</SelectItem>
               </SelectContent>
             </Select>
+
+            {/* ADD DIALOG */}
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
                 <Button>
@@ -433,7 +474,7 @@ function RouteComponent() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredDevices.map((device) => (
               <Card
-                key={device.id}
+                key={device._id}
                 className="hover:shadow-lg transition-shadow"
               >
                 <CardHeader className="pb-3">
@@ -456,7 +497,7 @@ function RouteComponent() {
                           Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => setDeviceToDelete(device.id)}
+                          onClick={() => setDeviceToDelete(device._id)}
                           className="text-red-600"
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
@@ -487,9 +528,9 @@ function RouteComponent() {
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Last Seen</p>
-                      <p className="font-medium">
+                      {/* <p className="font-medium">
                         {formatLastSeen(device.lastSeen)}
-                      </p>
+                      </p> */}
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       {device.batteryLevel !== undefined && (
@@ -670,7 +711,9 @@ function RouteComponent() {
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogCancel onClick={() => setDeviceToDelete(null)}>
+                  Cancel
+                </AlertDialogCancel>
                 <AlertDialogAction
                   onClick={() =>
                     deviceToDelete && handleDeleteDevice(deviceToDelete)
@@ -684,6 +727,7 @@ function RouteComponent() {
           </AlertDialog>
         </div>
       </div>
+      <ToastContainer />
     </Layout>
   );
 }

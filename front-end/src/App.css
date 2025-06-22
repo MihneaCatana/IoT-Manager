@@ -1,5 +1,9 @@
 /*shadcn components*/
 
+body {
+  pointer-events: auto !important;
+}
+
 :root {
   --background: 0 100% 95%;
   --foreground: 0 5% 0%;

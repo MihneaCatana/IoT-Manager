@@ -1,4 +1,5 @@
 import Device from "../model/deviceModel.js";
+import User from "../model/userModel.js";
 
 const deviceController = {
   create: async (req, res) => {
@@ -53,6 +54,51 @@ const deviceController = {
       }
 
       res.status(200).json({ device });
+    } catch (error) {
+      console.error("Error fetching devices:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  },
+
+  updateOne: async (req, res) => {
+    try {
+      const deviceId = req.params.id;
+      const { status, name, temperature, batteryLevel } = req.body;
+
+      const device = User.findOne({ _id: deviceId });
+
+      if (!device) {
+        return res
+          .status(404)
+          .json({ message: "Device not found or access denied." });
+      }
+
+      const updatedDevice = await Device.findByIdAndUpdate(
+        deviceId,
+        { name, status, temperature, batteryLevel },
+        { new: true }
+      );
+
+      res.status(200).json({ device: updatedDevice });
+    } catch (error) {
+      console.error("Error fetching devices:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  },
+
+  delete: async (req, res) => {
+    try {
+      const deviceId = req.params.id;
+
+      const deletedDevice = await Device.findByIdAndDelete({ _id: deviceId });
+
+      if (!deletedDevice) {
+        return res
+          .status(404)
+          .json({ message: "Device not found or access denied." });
+      }
+
+      res.status(200).json({ device: deletedDevice });
     } catch (error) {
       console.error("Error fetching devices:", error);
       res.status(500).json({ message: "Server error" });

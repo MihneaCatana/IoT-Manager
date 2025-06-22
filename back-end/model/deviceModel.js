@@ -9,21 +9,49 @@ const deviceSchema = mongoose.Schema({
   type: {
     type: String,
     required: true,
-    enum: ["sensor", "actuator", "gateway", "controller", "other"], // Adjust as needed
+    enum: [
+      "sensor",
+      "actuator",
+      "gateway",
+      "controller",
+      "other",
+      "thermostat",
+      "camera",
+    ], // Adjust as needed
   },
   status: {
     type: String,
     enum: ["online", "offline", "error", "maintenance"],
     default: "offline",
   },
+  space: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Space",
+  },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
-  isActive: {
-    type: Boolean,
-    default: true,
+  batteryLevel: {
+    type: Number,
+    default: 0,
+  },
+  temperature: {
+    type: Number,
+    default: 0,
+  },
+  humidity: {
+    type: Number,
+    default: 0,
+  },
+  powerConsumption: {
+    type: Number,
+    default: 0,
+  },
+  firmware: {
+    type: String,
+    default: "v1.0.0",
   },
   createdAt: {
     type: Date,
