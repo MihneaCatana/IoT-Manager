@@ -31,6 +31,16 @@ import { Device } from "@/interfaces/device";
 import { Space } from "@/interfaces/space";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface SpaceDetailsModalProps {
   isOpen: boolean;
@@ -47,6 +57,7 @@ export function SpaceDetailsModal({
 }: SpaceDetailsModalProps) {
   const [isAddDeviceModalOpen, setIsAddDeviceModalOpen] = useState(false);
   const [editingSpace, setEditingSpace] = useState(false);
+  const [spaceToDelete, setSpaceToDelete] = useState<string | null>(null);
   const [spaceData, setSpaceData] = useState(space);
 
   const getSpaceIcon = (type: string) => {
@@ -99,6 +110,29 @@ export function SpaceDetailsModal({
     };
     setSpaceData(updatedSpace);
     onUpdateSpace(updatedSpace);
+  };
+
+  const handleDeleteSpace = (spaceId: string) => {
+    axios
+      .delete(`http://localhost:8080/api/space/${spaceId}`)
+      .then(() => {
+        setSpaceToDelete(null);
+        onClose();
+        window.location.reload();
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Space couldn't be deleted!", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: false,
+          progress: undefined,
+          theme: "light",
+        });
+      });
   };
 
   const handleUpdateSpaceInfo = () => {
@@ -324,10 +358,20 @@ export function SpaceDetailsModal({
                       </div>
                     </>
                   ) : (
-                    <Button onClick={() => setEditingSpace(true)}>
-                      <Edit className="h-4 w-4 mr-2" />
-                      Edit Space Information
-                    </Button>
+                    <>
+                      <Button onClick={() => setEditingSpace(true)}>
+                        <Edit className="h-4 w-4 mr-2" />
+                        Edit Space Information
+                      </Button>
+                      <br />
+                      <Button
+                        variant="destructive"
+                        onClick={() => setSpaceToDelete(spaceData._id)}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete Space
+                      </Button>
+                    </>
                   )}
                 </CardContent>
               </Card>
@@ -336,6 +380,33 @@ export function SpaceDetailsModal({
         </DialogContent>
       </Dialog>
       <ToastContainer />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog
+        open={!!spaceToDelete}
+        onOpenChange={() => setSpaceToDelete(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the
+              device and remove all associated data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setSpaceToDelete(null)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => spaceToDelete && handleDeleteSpace(spaceToDelete)}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AddDeviceModal
         isOpen={isAddDeviceModalOpen}
