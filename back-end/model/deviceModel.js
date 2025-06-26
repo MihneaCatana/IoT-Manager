@@ -8,16 +8,7 @@ const deviceSchema = mongoose.Schema({
   },
   type: {
     type: String,
-    required: true,
-    enum: [
-      "sensor",
-      "actuator",
-      "gateway",
-      "controller",
-      "other",
-      "thermostat",
-      "camera",
-    ], // Adjust as needed
+    required: true, // Adjust as needed
   },
   status: {
     type: String,
@@ -61,4 +52,4 @@ const deviceSchema = mongoose.Schema({
 
 const Device = mongoose.model("Device", deviceSchema);
 
-export default Device;
+export { Device, deviceSchema };

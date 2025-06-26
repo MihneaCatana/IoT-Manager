@@ -79,10 +79,10 @@ export function SpaceDetailsModal({
     }
   };
 
-  const handleAddDevice = (device: Omit<Device, "id">) => {
+  const handleAddDevice = (device: Omit<Device, "_id">) => {
     const newDevice: Device = {
       ...device,
-      id: Date.now().toString(),
+      _id: Date.now().toString(),
     };
     const updatedSpace = {
       ...spaceData,
@@ -95,30 +95,32 @@ export function SpaceDetailsModal({
   const handleRemoveDevice = (deviceId: string) => {
     const updatedSpace = {
       ...spaceData,
-      devices: spaceData.devices.filter((device) => device.id !== deviceId),
+      devices: spaceData.devices.filter((device) => device._id !== deviceId),
     };
     setSpaceData(updatedSpace);
     onUpdateSpace(updatedSpace);
   };
 
   const handleUpdateSpaceInfo = () => {
-    
-    axios.put(`http://localhost:8080/api/space/${spaceData._id}`,spaceData).then(()=>{
-    onUpdateSpace(spaceData);
-    setEditingSpace(false);
-    }).catch((err)=>{
-      console.log(err)
-              toast.error("Space couldn't be updated!", {
-                position: "top-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: false,
-                draggable: false,
-                progress: undefined,
-                theme: "light",
-              });
-    })
+    axios
+      .put(`http://localhost:8080/api/space/${spaceData._id}`, spaceData)
+      .then(() => {
+        onUpdateSpace(spaceData);
+        setEditingSpace(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Space couldn't be updated!", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: false,
+          progress: undefined,
+          theme: "light",
+        });
+      });
   };
 
   return (
@@ -187,7 +189,9 @@ export function SpaceDetailsModal({
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Created:</span>
-                    <span className="font-medium">{spaceData.createdAt!.split('T')[0]}</span>
+                    <span className="font-medium">
+                      {spaceData.createdAt!.split("T")[0]}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Status:</span>
@@ -212,7 +216,7 @@ export function SpaceDetailsModal({
 
               <div className="grid gap-4">
                 {spaceData.devices.map((device) => (
-                  <Card key={device.id}>
+                  <Card key={device._id}>
                     <CardContent className="pt-4">
                       <div className="flex justify-between items-start">
                         <div className="space-y-1">
@@ -229,7 +233,7 @@ export function SpaceDetailsModal({
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleRemoveDevice(device.id)}
+                            onClick={() => handleRemoveDevice(device._id)}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -338,6 +342,7 @@ export function SpaceDetailsModal({
         onClose={() => setIsAddDeviceModalOpen(false)}
         onAddDevice={handleAddDevice}
         spaceType={spaceData.type}
+        spaceId={spaceData._id}
       />
     </>
   );

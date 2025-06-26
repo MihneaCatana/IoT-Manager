@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { deviceSchema } from "./deviceModel.js";
 
 const spaceSchema = mongoose.Schema({
   name: {
@@ -12,12 +13,12 @@ const spaceSchema = mongoose.Schema({
   },
   type: {
     type: String,
-    enum:['smart-home', 'factory','warehouse'],
+    enum: ["smart-home", "factory", "warehouse"],
     default: "smart-home",
   },
   status: {
     type: String,
-    enum:['inactive', 'active', 'maintenance'],
+    enum: ["inactive", "active", "maintenance"],
     default: "inactive",
   },
   owner: {
@@ -25,12 +26,10 @@ const spaceSchema = mongoose.Schema({
     ref: "User",
     required: true,
   },
-  devices: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Device",
-    },
-  ],
+  devices: {
+    type: [deviceSchema],
+    default: [],
+  },
   createdAt: {
     type: Date,
     default: Date.now,

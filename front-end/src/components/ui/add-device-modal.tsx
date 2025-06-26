@@ -19,6 +19,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
 
 interface Device {
   name: string;
@@ -32,6 +34,7 @@ interface AddDeviceModalProps {
   onClose: () => void;
   onAddDevice: (device: Device) => void;
   spaceType: "smart-home" | "factory" | "warehouse";
+  spaceId: string;
 }
 
 const deviceTypesBySpace = {
@@ -78,6 +81,7 @@ export function AddDeviceModal({
   onClose,
   onAddDevice,
   spaceType,
+  spaceId,
 }: AddDeviceModalProps) {
   const [formData, setFormData] = useState({
     name: "",
@@ -88,11 +92,35 @@ export function AddDeviceModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.type || !formData.location) return;
+    const userId = localStorage.getItem("id");
 
-    onAddDevice(formData);
-    setFormData({ name: "", type: "", status: "online", location: "" });
-    onClose();
+    if (!formData.name || !formData.type || !formData.location) return;
+    console.log(formData);
+
+    axios
+      .post(`http://localhost:8080/api/space/addDevice/${spaceId}`, {
+        ...formData,
+        userId,
+      })
+      .then((res) => {
+        console.log(res.data);
+        onAddDevice(formData);
+        setFormData({ name: "", type: "", status: "online", location: "" });
+        onClose();
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Device couldn't be added!", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: false,
+          progress: undefined,
+          theme: "light",
+        });
+      });
   };
 
   const handleClose = () => {
@@ -189,6 +217,7 @@ export function AddDeviceModal({
           </DialogFooter>
         </form>
       </DialogContent>
+      <ToastContainer />
     </Dialog>
   );
 }

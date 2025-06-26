@@ -1,4 +1,5 @@
-import Device from "../model/deviceModel.js";
+import { Device } from "../model/deviceModel.js";
+import Space from "../model/spaceModel.js";
 
 const deviceController = {
   create: async (req, res) => {
@@ -98,9 +99,18 @@ const deviceController = {
           .json({ message: "Device not found or access denied." });
       }
 
+      const space = await Space.findOne({ _id: deletedDevice.space });
+
+      if (space) {
+        space.devices = space.devices.filter(
+          (device) => device._id != deviceId
+        );
+        await space.save();
+      }
+
       res.status(200).json({ device: deletedDevice });
     } catch (error) {
-      console.error("Error fetching devices:", error);
+      console.error("Error deleting device:", error);
       res.status(500).json({ message: "Server error" });
     }
   },

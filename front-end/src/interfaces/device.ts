@@ -1,7 +1,7 @@
 export interface Device {
-    id: string;
-    name: string;
-    type: string;
-    status: "online" | "offline" | "maintenance";
-    location: string;
-  }
+  _id: string;
+  name: string;
+  type: string;
+  status: "online" | "offline" | "maintenance";
+  location: string;
+}
