@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import Layout from "@/components/ui/layout.tsx";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +24,8 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CreditCard, Download, Plus, Trash2 } from "lucide-react";
+import jsPDF from "jspdf";
+import CreditCardModal from "@/components/ui/credit-card-modal";
 
 export const Route = createFileRoute("/billing")({
   component: RouteComponent,
@@ -35,28 +37,7 @@ function RouteComponent() {
   const billingHistory = [
     {
       id: "INV-001",
-      date: "2024-01-15",
-      amount: "$29.00",
-      status: "Paid",
-      description: "Premium Plan - Monthly",
-    },
-    {
-      id: "INV-002",
-      date: "2023-12-15",
-      amount: "$29.00",
-      status: "Paid",
-      description: "Premium Plan - Monthly",
-    },
-    {
-      id: "INV-003",
-      date: "2023-11-15",
-      amount: "$29.00",
-      status: "Paid",
-      description: "Premium Plan - Monthly",
-    },
-    {
-      id: "INV-004",
-      date: "2023-10-15",
+      date: "2024-06-15",
       amount: "$29.00",
       status: "Paid",
       description: "Premium Plan - Monthly",
@@ -79,6 +60,13 @@ function RouteComponent() {
       isDefault: false,
     },
   ];
+
+  const handleDownload = (invoice: Object) => {
+    const doc = new jsPDF();
+    doc.text(JSON.stringify(invoice), 10, 10);
+    doc.save("real-pdf.pdf");
+  };
+
   return (
     <Layout>
       <div className="container max-w-4xl mx-auto p-6 space-y-8">
@@ -125,7 +113,7 @@ function RouteComponent() {
                   <div>
                     <p className="text-sm font-medium">Next billing date</p>
                     <p className="text-sm text-muted-foreground">
-                      February 15, 2024
+                      July 15, 2024
                     </p>
                   </div>
                   <div>
@@ -135,13 +123,13 @@ function RouteComponent() {
                 </div>
               </CardContent>
               <CardFooter className="flex gap-2">
-                <Button variant="outline">Change Plan</Button>
-                <Button variant="outline">Cancel Subscription</Button>
+                {/* <Button variant="outline">Change Plan</Button>
+                <Button variant="outline">Cancel Subscription</Button> */}
               </CardFooter>
             </Card>
 
             {/* Usage Summary */}
-            <Card>
+            {/* <Card>
               <CardHeader>
                 <CardTitle>Usage This Month</CardTitle>
                 <CardDescription>Your current usage and limits</CardDescription>
@@ -184,7 +172,7 @@ function RouteComponent() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
           </TabsContent>
 
           <TabsContent value="payment-methods" className="space-y-6">
@@ -217,9 +205,6 @@ function RouteComponent() {
                     </div>
                     <div className="flex space-x-2">
                       <Button variant="outline" size="sm">
-                        Edit
-                      </Button>
-                      <Button variant="outline" size="sm">
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
@@ -227,10 +212,7 @@ function RouteComponent() {
                 ))}
               </CardContent>
               <CardFooter>
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Payment Method
-                </Button>
+                <CreditCardModal />
               </CardFooter>
             </Card>
 
@@ -319,7 +301,11 @@ function RouteComponent() {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button variant="outline" size="sm">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDownload(invoice)}
+                          >
                             <Download className="mr-2 h-4 w-4" />
                             Download
                           </Button>
@@ -344,19 +330,21 @@ function RouteComponent() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  <p className="text-sm">• 1,000 API calls/month</p>
-                  <p className="text-sm">• 1 GB storage</p>
+                  <p className="text-sm">
+                    • 1 Space (e.g., home lab or test site)
+                  </p>
+                  <p className="text-sm">• Manage up to 5 IoT devices</p>
                   <p className="text-sm">• 1 team member</p>
-                  <p className="text-sm">• Email support</p>
+                  <p className="text-sm">• Basic email support</p>
                 </CardContent>
                 <CardFooter>
-                  <Button
+                  {/* <Button
                     variant="outline"
                     className="w-full"
                     disabled={currentPlan === "Free"}
                   >
                     {currentPlan === "Free" ? "Current Plan" : "Downgrade"}
-                  </Button>
+                  </Button> */}
                 </CardFooter>
               </Card>
 
@@ -373,16 +361,22 @@ function RouteComponent() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  <p className="text-sm">• 10,000 API calls/month</p>
+                  <p className="text-sm">
+                    • 5 Spaces (e.g., different locations, departments, or use
+                    cases)
+                  </p>
+                  <p className="text-sm">• Manage up to 50 IoT devices</p>
                   <p className="text-sm">• 5 GB storage</p>
-                  <p className="text-sm">• 5 team members</p>
-                  <p className="text-sm">• Priority support</p>
-                  <p className="text-sm">• Advanced analytics</p>
+                  <p className="text-sm">• Up to 5 team members</p>
+                  <p className="text-sm">• Priority email support</p>
+                  <p className="text-sm">
+                    • Device analytics & health monitoring
+                  </p>
                 </CardContent>
                 <CardFooter>
-                  <Button className="w-full" disabled>
+                  {/* <Button className="w-full" disabled>
                     Current Plan
-                  </Button>
+                  </Button> */}
                 </CardFooter>
               </Card>
 
@@ -392,15 +386,18 @@ function RouteComponent() {
                   <CardTitle>Enterprise</CardTitle>
                   <CardDescription>For large-scale operations</CardDescription>
                   <div className="text-3xl font-bold">
-                    $99<span className="text-sm font-normal">/month</span>
+                    Custom<span className="text-sm font-normal"></span>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  <p className="text-sm">• Unlimited API calls</p>
-                  <p className="text-sm">• 50 GB storage</p>
+                  <p className="text-sm">• Unlimited Spaces</p>
+                  <p className="text-sm">• Unlimited IoT devices</p>
+                  <p className="text-sm">• 50 GB+ storage (expandable)</p>
                   <p className="text-sm">• Unlimited team members</p>
-                  <p className="text-sm">• 24/7 phone support</p>
-                  <p className="text-sm">• Custom integrations</p>
+                  <p className="text-sm">• 24/7 phone & email support</p>
+                  <p className="text-sm">
+                    • Custom integrations (e.g., ERP, analytics platforms)
+                  </p>
                 </CardContent>
                 <CardFooter>
                   <Button className="w-full">Upgrade to Enterprise</Button>

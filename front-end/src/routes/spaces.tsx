@@ -78,7 +78,9 @@ function RouteComponent() {
   };
 
   const handleSpaceClick = (space: Space) => {
+    console.log("click");
     setSelectedSpace(space);
+    console.log(space);
     setIsDetailsModalOpen(true);
   };
 
@@ -270,7 +272,10 @@ function RouteComponent() {
           {selectedSpace && (
             <SpaceDetailsModal
               isOpen={isDetailsModalOpen}
-              onClose={() => setIsDetailsModalOpen(false)}
+              onClose={() => {
+                setIsDetailsModalOpen(false);
+                setSelectedSpace(null);
+              }}
               space={selectedSpace}
               onUpdateSpace={handleUpdateSpace}
             />
