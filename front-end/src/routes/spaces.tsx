@@ -78,9 +78,7 @@ function RouteComponent() {
   };
 
   const handleSpaceClick = (space: Space) => {
-    console.log("click");
     setSelectedSpace(space);
-    console.log(space);
     setIsDetailsModalOpen(true);
   };
 

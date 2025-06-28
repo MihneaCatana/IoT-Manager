@@ -80,6 +80,15 @@ const deviceController = {
         { new: true }
       );
 
+      const spaceDevice = await Space.findOne({ _id: updatedDevice.space });
+
+      if (spaceDevice) {
+        spaceDevice.devices = spaceDevice.devices.map((device) => {
+          return device._id != deviceId ? device : updatedDevice;
+        });
+        await spaceDevice.save();
+      }
+
       res.status(200).json({ device: updatedDevice });
     } catch (error) {
       console.error("Error fetching devices:", error);

@@ -95,6 +95,7 @@ const userController = {
       const user = await User.findOne({ _id: id });
 
       if (user) {
+        delete user.password;
         return res.status(200).json(user);
       } else return res.status(404).json({ message: "User not found" });
     } catch (error) {
@@ -107,16 +108,35 @@ const userController = {
     try {
       const { id } = req.params;
 
-      const { firstName, lastName, username, email, location } = req.body;
+      const {
+        firstName,
+        lastName,
+        username,
+        email,
+        location,
+        city,
+        country,
+        zip,
+      } = req.body;
 
       const user = await User.findOne({ _id: id });
 
       if (user) {
         const updatedUser = await User.findByIdAndUpdate(
           id,
-          { firstName, lastName, username, email, location },
+          {
+            firstName,
+            lastName,
+            username,
+            email,
+            location,
+            city,
+            country,
+            zip,
+          },
           { new: true }
         );
+        delete updatedUser.password;
         return res.status(200).json(updatedUser);
       } else return res.status(404).json({ message: "User not found" });
     } catch (error) {

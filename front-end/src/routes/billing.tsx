@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import Layout from "@/components/ui/layout.tsx";
-import { useCallback, useState } from "react";
+import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,6 +26,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CreditCard, Download, Plus, Trash2 } from "lucide-react";
 import jsPDF from "jspdf";
 import CreditCardModal from "@/components/ui/credit-card-modal";
+import axios from "axios";
+import { UserProfile } from "@/interfaces/user";
+import { ToastContainer, toast } from "react-toastify";
 
 export const Route = createFileRoute("/billing")({
   component: RouteComponent,
@@ -33,6 +36,14 @@ export const Route = createFileRoute("/billing")({
 
 function RouteComponent() {
   const [currentPlan, setCurrentPlan] = useState("Premium");
+  const [profile, setProfile] = useState<UserProfile>({
+    username: "johndoe",
+    email: "john.doe@example.com",
+    firstName: "John",
+    lastName: "Doe",
+    location: "San Francisco, CA",
+    profileImage: "/placeholder.svg?height=120&width=120",
+  });
 
   const billingHistory = [
     {
@@ -52,19 +63,59 @@ function RouteComponent() {
       expiry: "12/25",
       isDefault: true,
     },
-    {
-      id: "pm_2",
-      type: "Mastercard",
-      last4: "8888",
-      expiry: "09/26",
-      isDefault: false,
-    },
   ];
 
   const handleDownload = (invoice: Object) => {
     const doc = new jsPDF();
     doc.text(JSON.stringify(invoice), 10, 10);
     doc.save("real-pdf.pdf");
+  };
+
+  useEffect(() => {
+    const id = localStorage.getItem("id");
+
+    axios.get(`http://localhost:8080/api/user/${id}`).then((res) => {
+      setProfile({
+        ...res.data,
+        profileImage: "/placeholder.svg?height=120&width=120",
+      });
+    });
+  }, []);
+
+  const handleInputChange = (field: keyof UserProfile, value: any) => {
+    setProfile((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSave = () => {
+    console.log("Saving profile:", profile);
+    const id = localStorage.getItem("id");
+    axios
+      .put(`http://localhost:8080/api/user/${id}`, profile)
+      .then(() => {
+        toast.success("Billing has been updated!", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: false,
+          progress: undefined,
+          theme: "light",
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Billing couldn't be updated!", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: false,
+          progress: undefined,
+          theme: "light",
+        });
+      });
   };
 
   return (
@@ -228,34 +279,68 @@ function RouteComponent() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="firstName">First Name</Label>
-                    <Input id="firstName" defaultValue="John" />
+                    <Input
+                      id="firstName"
+                      value={profile.firstName}
+                      onChange={(e) =>
+                        handleInputChange("firstName", e.target.value)
+                      }
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="lastName">Last Name</Label>
-                    <Input id="lastName" defaultValue="Doe" />
+                    <Input
+                      id="lastName"
+                      value={profile.lastName}
+                      onChange={(e) =>
+                        handleInputChange("lastName", e.target.value)
+                      }
+                    />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="address">Address</Label>
-                  <Input id="address" defaultValue="123 Main Street" />
+                  <Input
+                    id="address"
+                    value={profile.location}
+                    onChange={(e) =>
+                      handleInputChange("location", e.target.value)
+                    }
+                  />
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="city">City</Label>
-                    <Input id="city" defaultValue="San Francisco" />
+                    <Input
+                      id="city"
+                      value={profile.city}
+                      onChange={(e) =>
+                        handleInputChange("city", e.target.value)
+                      }
+                    />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="state">State</Label>
-                    <Input id="state" defaultValue="CA" />
+                    <Label htmlFor="state">Country</Label>
+                    <Input
+                      id="state"
+                      value={profile.country}
+                      onChange={(e) =>
+                        handleInputChange("country", e.target.value)
+                      }
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="zip">ZIP Code</Label>
-                    <Input id="zip" defaultValue="94105" />
+                    <Input
+                      id="zip"
+                      value={profile.zip}
+                      onChange={(e) => handleInputChange("zip", e.target.value)}
+                    />
                   </div>
                 </div>
               </CardContent>
               <CardFooter>
-                <Button>Update Address</Button>
+                <Button onClick={handleSave}>Update Address</Button>
               </CardFooter>
             </Card>
           </TabsContent>
@@ -407,6 +492,7 @@ function RouteComponent() {
           </TabsContent>
         </Tabs>
       </div>
+      <ToastContainer />
     </Layout>
   );
 }

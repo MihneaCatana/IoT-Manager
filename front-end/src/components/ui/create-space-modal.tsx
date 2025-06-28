@@ -46,37 +46,39 @@ export function CreateSpaceModal({
     e.preventDefault();
     if (!formData.name || !formData.type || !formData.location) return;
 
-    const userId = localStorage.getItem('id');
+    const userId = localStorage.getItem("id");
 
     const newSpace: Space = {
-      _id:'',
+      _id: "",
       name: formData.name,
       type: formData.type as "smart-home" | "factory" | "warehouse",
       location: formData.location,
       devices: [],
-      owner:userId as string,
+      owner: userId as string,
       status: "active",
     };
 
-    axios.post("http://localhost:8080/api/space", newSpace).then(()=>{
-    onCreateSpace(newSpace);
-    setFormData({ name: "", type: "", location: "", description: "" });
-    onClose();
-    }).catch((err)=>{
-      console.log(err);
-      toast.error("Space couldn't be added!", {
-                position: "top-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: false,
-                draggable: false,
-                progress: undefined,
-                theme: "light",
-              });
-    })
-
-
+    axios
+      .post("http://localhost:8080/api/space", newSpace)
+      .then(() => {
+        onCreateSpace(newSpace);
+        setFormData({ name: "", type: "", location: "", description: "" });
+        onClose();
+        window.location.reload();
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Space couldn't be added!", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: false,
+          progress: undefined,
+          theme: "light",
+        });
+      });
   };
 
   const handleClose = () => {

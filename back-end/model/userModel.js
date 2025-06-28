@@ -21,7 +21,18 @@ const userSchema = mongoose.Schema({
   location: {
     type: String,
     trim: true,
-    default: "Bucharest, RO",
+  },
+  city: {
+    type: String,
+    trim: true,
+  },
+  country: {
+    type: String,
+    trim: true,
+  },
+  zip: {
+    type: String,
+    trim: true,
   },
   email: {
     type: String,
@@ -36,10 +47,10 @@ const userSchema = mongoose.Schema({
     required: true,
     minlength: 6,
   },
-  role: {
+  subscription: {
     type: String,
-    enum: ["user", "admin"],
-    default: "user",
+    enum: ["Free", "Premium", "Enterprise"],
+    default: "Free",
   },
   isActive: {
     type: Boolean,

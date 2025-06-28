@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Camera, MapPin, Mail, User } from "lucide-react";
 import axios from "axios";
 import { UserProfile } from "@/interfaces/user";
+import { ToastContainer, toast } from "react-toastify";
 
 export const Route = createFileRoute("/account")({
   component: RouteComponent,
@@ -39,9 +40,24 @@ function RouteComponent() {
   const handleSave = () => {
     console.log("Saving profile:", profile);
     const id = localStorage.getItem("id");
-    axios.put(`http://localhost:8080/api/user/${id}`, profile).then(() => {
-      setIsEditing(false);
-    });
+    axios
+      .put(`http://localhost:8080/api/user/${id}`, profile)
+      .then(() => {
+        setIsEditing(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Profile couldn't be updated!", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: false,
+          progress: undefined,
+          theme: "light",
+        });
+      });
   };
 
   useEffect(() => {
@@ -209,6 +225,7 @@ function RouteComponent() {
           </div>
         </div>
       </div>
+      <ToastContainer />
     </Layout>
   );
 }

@@ -5,4 +5,7 @@ export interface UserProfile {
   lastName: string;
   location: string;
   profileImage: string;
+  city?: string;
+  country?: string;
+  zip?: string;
 }

@@ -26,15 +26,12 @@ const deviceSchema = mongoose.Schema({
   },
   batteryLevel: {
     type: Number,
-    default: 0,
   },
   temperature: {
     type: Number,
-    default: 0,
   },
   humidity: {
     type: Number,
-    default: 0,
   },
   powerConsumption: {
     type: Number,

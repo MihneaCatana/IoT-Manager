@@ -3,17 +3,10 @@ import Layout from "@/components/ui/layout.tsx";
 import { useEffect, useState } from "react";
 import {
   Activity,
-  Thermometer,
-  Droplets,
-  Lightbulb,
-  Shield,
   Wifi,
   WifiOff,
   AlertTriangle,
   CheckCircle,
-  Home,
-  Building,
-  Factory,
 } from "lucide-react";
 import {
   Card,
@@ -182,12 +175,6 @@ const temperatureData = [
   { time: "12:00", temperature: 24.3 },
   { time: "16:00", temperature: 23.7 },
   { time: "20:00", temperature: 22.4 },
-];
-
-const deviceStatusData = [
-  { status: "Online", count: 40 },
-  { status: "Offline", count: 3 },
-  { status: "Warning", count: 1 },
 ];
 
 export const Route = createFileRoute("/dashboard")({
