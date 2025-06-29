@@ -35,6 +35,9 @@ import {
 import axios from "axios";
 import { Space } from "@/interfaces/space";
 import { ToastContainer, toast } from "react-toastify";
+import io from "socket.io-client";
+
+const socket = io("http://localhost:8080");
 
 // Mock chart data
 const temperatureData = [
@@ -53,6 +56,7 @@ export const Route = createFileRoute("/dashboard")({
 function RouteComponent() {
   const [selectedSpace, setSelectedSpace] = useState<Space | null>(null);
   const [spaces, setSpaces] = useState<Space[]>([]);
+  const [deviceEvents, setDeviceEvents] = useState(new Map());
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -129,6 +133,22 @@ function RouteComponent() {
           theme: "light",
         });
       });
+
+    socket.on("iot-manager", (message) => {
+      const data = JSON.parse(message);
+      const { deviceId } = data;
+
+      setDeviceEvents((prev) => {
+        const updated = new Map(prev);
+        updated.set(deviceId, data);
+        return updated;
+      });
+    });
+
+    // Cleanup on unmount
+    return () => {
+      socket.off("iot-manager");
+    };
   }, []);
 
   return (
@@ -289,6 +309,12 @@ function RouteComponent() {
                           </div>
                         </div>
                       }
+                      {deviceEvents.has(device._id) && (
+                        <div>
+                          {deviceEvents.get(device._id).events.powerConsumption}{" "}
+                          MW / h
+                        </div>
+                      )}
 
                       <div className="flex items-center gap-2">
                         <div

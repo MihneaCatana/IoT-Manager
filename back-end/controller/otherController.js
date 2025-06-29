@@ -6,7 +6,6 @@ import mongoose from "mongoose";
 import { Device } from "../model/deviceModel.js";
 import { v4 as uuidv4 } from "uuid";
 import kafka from "../config/config.js";
-import { Server } from "socket.io";
 
 const otherController = {
   generateMockData: async (req, res) => {
@@ -117,7 +116,6 @@ const otherController = {
         const messages = [];
         for (const device of devices) {
           let eventMessage;
-          console.log(device.type);
 
           if (device.type === "Humidity Sensor") {
             eventMessage = {
@@ -163,7 +161,6 @@ const otherController = {
           messages.push(message);
         }
 
-        console.log(messages);
         kafka.produceMessage(process.env.TOPIC_NAME, messages);
       }, 5000);
 

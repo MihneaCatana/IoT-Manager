@@ -14,7 +14,7 @@ const kafkaConfig = new Kafka({
 const producer = kafkaConfig.producer();
 
 const consumer = kafkaConfig.consumer({
-  groupId: "test-group",
+  groupId: "iot-manager",
 });
 
 const produceMessage = async (topic, messages) => {
@@ -31,13 +31,15 @@ const produceMessage = async (topic, messages) => {
   }
 };
 
-const consumeMessage = async (topic, callback) => {
+const consumeMessage = async (topic, io, callback) => {
   try {
     await consumer.connect();
-    await consumer.subscribe({ topic: topic, fromBeginning: true });
+    await consumer.subscribe({ topic: topic, fromBeginning: false });
     await consumer.run({
       eachMessage: async ({ topic, partition, message }) => {
         const value = message.value.toString();
+        console.log(`Received Kafka message: ${value}`);
+        io.emit("iot-manager", value);
         callback(value);
       },
     });
