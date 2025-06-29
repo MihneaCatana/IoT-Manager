@@ -4,4 +4,7 @@ export interface Device {
   type: string;
   status: "online" | "offline" | "maintenance";
   location: string;
+  events?: {
+    powerConsumption?: number;
+  };
 }

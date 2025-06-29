@@ -36,137 +36,6 @@ import axios from "axios";
 import { Space } from "@/interfaces/space";
 import { ToastContainer, toast } from "react-toastify";
 
-// Mock data for IoT devices and spaces
-// const spaces = [
-//   {
-//     id: "office",
-//     name: "Office Floor",
-//     icon: Building,
-//     deviceCount: 12,
-//     activeDevices: 11,
-//     devices: [
-//       {
-//         id: "temp-01",
-//         name: "Temperature Sensor",
-//         type: "temperature",
-//         icon: Thermometer,
-//         status: "online",
-//         value: "22.5°C",
-//         battery: 85,
-//         lastUpdate: "2 min ago",
-//       },
-//       {
-//         id: "hum-01",
-//         name: "Humidity Sensor",
-//         type: "humidity",
-//         icon: Droplets,
-//         status: "online",
-//         value: "45%",
-//         battery: 72,
-//         lastUpdate: "1 min ago",
-//       },
-//       {
-//         id: "light-01",
-//         name: "Smart Light",
-//         type: "light",
-//         icon: Lightbulb,
-//         status: "online",
-//         value: "On - 75%",
-//         battery: null,
-//         lastUpdate: "30 sec ago",
-//       },
-//       {
-//         id: "sec-01",
-//         name: "Security Camera",
-//         type: "security",
-//         icon: Shield,
-//         status: "offline",
-//         value: "Offline",
-//         battery: 15,
-//         lastUpdate: "1 hour ago",
-//       },
-//     ],
-//   },
-//   {
-//     id: "home",
-//     name: "Smart Home",
-//     icon: Home,
-//     deviceCount: 8,
-//     activeDevices: 7,
-//     devices: [
-//       {
-//         id: "temp-02",
-//         name: "Living Room Temp",
-//         type: "temperature",
-//         icon: Thermometer,
-//         status: "online",
-//         value: "24.1°C",
-//         battery: 92,
-//         lastUpdate: "1 min ago",
-//       },
-//       {
-//         id: "light-02",
-//         name: "Kitchen Light",
-//         type: "light",
-//         icon: Lightbulb,
-//         status: "online",
-//         value: "Off",
-//         battery: null,
-//         lastUpdate: "5 min ago",
-//       },
-//       {
-//         id: "sec-02",
-//         name: "Front Door Camera",
-//         type: "security",
-//         icon: Shield,
-//         status: "online",
-//         value: "Recording",
-//         battery: 88,
-//         lastUpdate: "30 sec ago",
-//       },
-//     ],
-//   },
-//   {
-//     id: "warehouse",
-//     name: "Warehouse",
-//     icon: Factory,
-//     deviceCount: 24,
-//     activeDevices: 22,
-//     devices: [
-//       {
-//         id: "temp-03",
-//         name: "Zone A Temperature",
-//         type: "temperature",
-//         icon: Thermometer,
-//         status: "online",
-//         value: "18.3°C",
-//         battery: 67,
-//         lastUpdate: "3 min ago",
-//       },
-//       {
-//         id: "hum-02",
-//         name: "Zone A Humidity",
-//         type: "humidity",
-//         icon: Droplets,
-//         status: "warning",
-//         value: "78%",
-//         battery: 45,
-//         lastUpdate: "2 min ago",
-//       },
-//       {
-//         id: "sec-03",
-//         name: "Loading Bay Camera",
-//         type: "security",
-//         icon: Shield,
-//         status: "online",
-//         value: "Active",
-//         battery: 91,
-//         lastUpdate: "1 min ago",
-//       },
-//     ],
-//   },
-// ];
-
 // Mock chart data
 const temperatureData = [
   { time: "00:00", temperature: 20.5 },
@@ -412,24 +281,14 @@ function RouteComponent() {
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                      <div>
-                        {/* <div className="text-lg font-semibold">
-                          {device.value}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          Last update: {device.lastUpdate}
-                        </div> */}
-                      </div>
-
-                      {/* {device.battery !== null && (
+                      {
                         <div>
                           <div className="flex justify-between text-xs mb-1">
-                            <span>Battery</span>
-                            <span>{device.battery}%</span>
+                            <span>Power Consumption</span>
+                            <span>{device?.events?.powerConsumption}W</span>
                           </div>
-                          <Progress value={device.battery} className="h-2" />
                         </div>
-                      )} */}
+                      }
 
                       <div className="flex items-center gap-2">
                         <div
@@ -451,7 +310,7 @@ function RouteComponent() {
               {/* Temperature Chart */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Temperature Trends</CardTitle>
+                  <CardTitle>Power Trends</CardTitle>
                   <CardDescription>Last 24 hours</CardDescription>
                 </CardHeader>
                 <CardContent>

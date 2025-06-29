@@ -3,15 +3,15 @@ import { v4 as uuidv4 } from "uuid";
 
 const sendMessageToKafka = async (req, res) => {
   try {
-    const { message } = req.body;
+    const { message, userId } = req.body;
     const id = uuidv4();
     const messages = [
       {
         key: id,
         value: JSON.stringify({
-          expirationDate: new Date(),
+          timestamp: new Date(),
           message: message,
-          user: "test",
+          user: userId,
         }),
         timestamp: new Date(),
       },

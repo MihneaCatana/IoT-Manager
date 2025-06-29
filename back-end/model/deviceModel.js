@@ -24,18 +24,24 @@ const deviceSchema = mongoose.Schema({
     ref: "User",
     required: true,
   },
-  batteryLevel: {
-    type: Number,
-  },
-  temperature: {
-    type: Number,
-  },
-  humidity: {
-    type: Number,
-  },
-  powerConsumption: {
-    type: Number,
-    default: 0,
+  events: {
+    timestamp: {
+      type: Date,
+      default: Date.now,
+    },
+    batteryLevel: {
+      type: Number,
+    },
+    temperature: {
+      type: Number,
+    },
+    humidity: {
+      type: Number,
+    },
+    powerConsumption: {
+      type: Number,
+      default: 0,
+    },
   },
   firmware: {
     type: String,

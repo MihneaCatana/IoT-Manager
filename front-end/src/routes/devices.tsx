@@ -60,7 +60,12 @@ export const Route = createFileRoute("/devices")({
 interface IoTDevice {
   _id: string;
   name: string;
-  type: "sensor" | "actuator" | "gateway" | "camera" | "thermostat";
+  type:
+    | "Humidity Sensor"
+    | "Temperature Sensor"
+    | "Smoke Detector"
+    | "Security Camera"
+    | "Smart Lights";
   status: "online" | "offline" | "maintenance";
   space: string;
   lastSeen: Date;
@@ -73,7 +78,7 @@ interface IoTDevice {
 
 const defaultValuesNewDevice: Partial<IoTDevice> = {
   name: "",
-  type: "sensor",
+  type: "Humidity Sensor",
   status: "offline",
   space: undefined,
   firmware: "v1.0.0",
@@ -350,11 +355,13 @@ function RouteComponent() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="sensor">Sensor</SelectItem>
-                <SelectItem value="actuator">Actuator</SelectItem>
-                <SelectItem value="gateway">Gateway</SelectItem>
-                <SelectItem value="camera">Camera</SelectItem>
-                <SelectItem value="thermostat">Thermostat</SelectItem>
+                <SelectItem value="Humidity Sensor">Humidity Sensor</SelectItem>
+                <SelectItem value="Temperature Sensor">
+                  Temperature Sensor
+                </SelectItem>
+                <SelectItem value="Smoke Detector">Smoke Detector</SelectItem>
+                <SelectItem value="Security Camera">Security Camera</SelectItem>
+                <SelectItem value="Smart Lights">Smart Lights</SelectItem>
               </SelectContent>
             </Select>
 
