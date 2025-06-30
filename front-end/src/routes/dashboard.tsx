@@ -41,13 +41,66 @@ const socket = io("http://localhost:8080");
 
 // Mock chart data
 const temperatureData = [
-  { time: "00:00", temperature: 20.5 },
-  { time: "04:00", temperature: 19.8 },
-  { time: "08:00", temperature: 22.1 },
-  { time: "12:00", temperature: 24.3 },
-  { time: "16:00", temperature: 23.7 },
-  { time: "20:00", temperature: 22.4 },
+  { time: "00:00", power: 20.5 },
+  { time: "04:00", power: 19.8 },
+  { time: "08:00", power: 22.1 },
+  { time: "12:00", power: 24.3 },
+  { time: "16:00", power: 23.7 },
+  { time: "20:00", power: 22.4 },
 ];
+
+const labelMap = {
+  powerConsumption: "Power (W/h): ",
+  humidity: "Humidity (%): ",
+  temperature: "Temperature (°C): ",
+  battery: "Battery (%): ",
+};
+
+function groupAndAccumulate(data: any) {
+  return Object.values(
+    data.reduce(
+      (
+        acc: any,
+        { timestamp, value }: { timestamp: string; value: number }
+      ) => {
+        const timeKey = timestamp.slice(11, 19);
+        if (!acc[timestamp]) {
+          acc[timestamp] = { timestamp: timeKey, totalPower: 0 };
+        }
+        acc[timestamp].totalPower += value;
+        return acc;
+      },
+      {}
+    )
+  );
+}
+
+function getTimestampAndAveragePower(map: Map<string, any>) {
+  const entries = Array.from(map.values());
+
+  const { total, count, timestamp } = entries.reduce(
+    (acc, item) => {
+      const power = item?.events?.powerConsumption;
+      if (typeof power === "number") {
+        acc.total += power;
+        acc.count += 1;
+      }
+      // Set timestamp once
+      if (!acc.timestamp) {
+        acc.timestamp = item.timestamp;
+      }
+      return acc;
+    },
+    { total: 0, count: 0, timestamp: null as string | null }
+  );
+
+  return {
+    timestamp,
+    value: count > 0 ? total / count : 0,
+  };
+}
+
+type labelType = "powerConsumption" | "humidity" | "temperature";
 
 export const Route = createFileRoute("/dashboard")({
   component: RouteComponent,
@@ -57,6 +110,7 @@ function RouteComponent() {
   const [selectedSpace, setSelectedSpace] = useState<Space | null>(null);
   const [spaces, setSpaces] = useState<Space[]>([]);
   const [deviceEvents, setDeviceEvents] = useState(new Map());
+  const [powerData, setPowerData] = useState<any[]>([]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -141,6 +195,10 @@ function RouteComponent() {
       setDeviceEvents((prev) => {
         const updated = new Map(prev);
         updated.set(deviceId, data);
+        setPowerData((prev) => {
+          prev.push(getTimestampAndAveragePower(updated));
+          return prev;
+        });
         return updated;
       });
     });
@@ -301,18 +359,18 @@ function RouteComponent() {
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                      {
-                        <div>
-                          <div className="flex justify-between text-xs mb-1">
-                            <span>Power Consumption</span>
-                            <span>{device?.events?.powerConsumption}W</span>
-                          </div>
-                        </div>
-                      }
                       {deviceEvents.has(device._id) && (
-                        <div>
-                          {deviceEvents.get(device._id).events.powerConsumption}{" "}
-                          MW / h
+                        <div className="flex flex-col gap-4 justify-between text-xs mb-1">
+                          {Object.entries(
+                            deviceEvents.get(device._id).events
+                          ).map(([key, value]) => {
+                            return (
+                              <div key={key}>
+                                <span>{labelMap[key as labelType] || key}</span>
+                                <span>{value as string}</span>
+                              </div>
+                            );
+                          })}
                         </div>
                       )}
 
@@ -342,21 +400,21 @@ function RouteComponent() {
                 <CardContent>
                   <ChartContainer
                     config={{
-                      temperature: {
-                        label: "Temperature",
+                      power: {
+                        label: "Total Power",
                         color: "hsl(var(--chart-1))",
                       },
                     }}
                     className="h-[200px]"
                   >
-                    <LineChart data={temperatureData}>
+                    <LineChart data={groupAndAccumulate(powerData)}>
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="time" />
+                      <XAxis dataKey="timestamp" />
                       <YAxis />
                       <ChartTooltip content={<ChartTooltipContent />} />
                       <Line
                         type="monotone"
-                        dataKey="temperature"
+                        dataKey="totalPower"
                         stroke="green"
                         strokeWidth={2}
                       />
