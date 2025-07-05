@@ -55,19 +55,58 @@ function RouteComponent() {
     },
   ];
 
-  const paymentMethods = [
-    {
-      id: "pm_1",
-      type: "Visa",
-      last4: "4242",
-      expiry: "12/25",
-      isDefault: true,
-    },
-  ];
-
-  const handleDownload = (invoice: Object) => {
+  const handleDownload = (invoiceData: {
+    id: string;
+    date: string;
+    amount: string;
+    status: string;
+    description: string;
+  }) => {
     const doc = new jsPDF();
-    doc.text(JSON.stringify(invoice), 10, 10);
+    // Title
+    doc.setFontSize(18);
+    doc.text("INVOICE", 105, 20, { align: "center" });
+
+    // Company Info
+    doc.setFontSize(11);
+    doc.text("Your Billing Address", 20, 30);
+    doc.text(profile.firstName + " " + profile.lastName, 20, 36);
+    doc.text(
+      profile.country + ", " + profile.city + ", " + profile.location,
+      20,
+      42
+    );
+    doc.text("Email: " + profile.email, 20, 48);
+
+    // Invoice Info
+    doc.text(`Invoice ID: ${invoiceData.id}`, 140, 30);
+    doc.text(`Date: ${invoiceData.date}`, 140, 36);
+    doc.text(`Status: ${invoiceData.status}`, 140, 42);
+
+    // Line separator
+    doc.line(20, 55, 190, 55);
+
+    // Table Header
+    doc.setFontSize(12);
+    doc.text("Description", 20, 65);
+    doc.text("Amount", 170, 65, { align: "right" });
+
+    // Table Content
+    doc.setFontSize(11);
+    doc.text(invoiceData.description, 20, 75);
+    doc.text(invoiceData.amount, 170, 75, { align: "right" });
+
+    // Total
+    doc.setFontSize(12);
+    doc.line(20, 90, 190, 90);
+    doc.text("Total", 20, 100);
+    doc.text(invoiceData.amount, 170, 100, { align: "right" });
+
+    // Footer
+    doc.setFontSize(10);
+    doc.text("Thank you for your business!", 105, 130, { align: "right" });
+
+    doc.save(`${invoiceData.id}.pdf`);
     doc.save("real-pdf.pdf");
   };
 
@@ -174,60 +213,16 @@ function RouteComponent() {
                 </div>
               </CardContent>
               <CardFooter className="flex gap-2">
-                {/* <Button variant="outline">Change Plan</Button>
-                <Button variant="outline">Cancel Subscription</Button> */}
+                <stripe-buy-button
+                  buy-button-id="buy_btn_1RhaiJQ38hUO9iJSdQcCbJ1I"
+                  publishable-key="pk_test_51Rf4bJQ38hUO9iJSDUPDzRGBo80h4tl2Nx4OlOobpSsOq9ckERldSxyDXycw6AwONIryc5MRUQ4PBwXlDaZb09Ms00PPnNgitC"
+                ></stripe-buy-button>
               </CardFooter>
             </Card>
-
-            {/* Usage Summary */}
-            {/* <Card>
-              <CardHeader>
-                <CardTitle>Usage This Month</CardTitle>
-                <CardDescription>Your current usage and limits</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>API Calls</span>
-                    <span>8,432 / 10,000</span>
-                  </div>
-                  <div className="w-full bg-secondary rounded-full h-2">
-                    <div
-                      className="bg-primary h-2 rounded-full"
-                      style={{ width: "84%" }}
-                    ></div>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Storage</span>
-                    <span>2.1 GB / 5 GB</span>
-                  </div>
-                  <div className="w-full bg-secondary rounded-full h-2">
-                    <div
-                      className="bg-primary h-2 rounded-full"
-                      style={{ width: "42%" }}
-                    ></div>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Team Members</span>
-                    <span>3 / 5</span>
-                  </div>
-                  <div className="w-full bg-secondary rounded-full h-2">
-                    <div
-                      className="bg-primary h-2 rounded-full"
-                      style={{ width: "60%" }}
-                    ></div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card> */}
           </TabsContent>
 
           <TabsContent value="payment-methods" className="space-y-6">
-            <Card>
+            {/* <Card>
               <CardHeader>
                 <CardTitle>Payment Methods</CardTitle>
                 <CardDescription>
@@ -235,24 +230,19 @@ function RouteComponent() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {paymentMethods.map((method) => (
-                  <div
-                    key={method.id}
-                    className="flex items-center justify-between p-4 border rounded-lg"
-                  >
+                {paymentMethods && (
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex items-center space-x-4">
                       <CreditCard className="h-8 w-8 text-muted-foreground" />
                       <div>
                         <p className="font-medium">
-                          {method.type} ending in {method.last4}
+                          VISA ending in {paymentMethods.number}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          Expires {method.expiry}
+                          Expires in {paymentMethods.expiry}
                         </p>
                       </div>
-                      {method.isDefault && (
-                        <Badge variant="secondary">Default</Badge>
-                      )}
+                      <Badge variant="secondary">Default</Badge>
                     </div>
                     <div className="flex space-x-2">
                       <Button variant="outline" size="sm">
@@ -260,12 +250,12 @@ function RouteComponent() {
                       </Button>
                     </div>
                   </div>
-                ))}
+                )}
               </CardContent>
               <CardFooter>
                 <CreditCardModal />
               </CardFooter>
-            </Card>
+            </Card> */}
 
             {/* Billing Address */}
             <Card>

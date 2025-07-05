@@ -37,7 +37,17 @@ export default function CreditCardModal() {
 
   const handleSubmit = () => {
     // You can hook this to a payment API
+    localStorage.setItem("card", JSON.stringify(cardData));
     console.log("Submitting card data:", cardData);
+  };
+
+  const validation = () => {
+    return (
+      cardData.number.length != 16 ||
+      cardData.cvc.length != 3 ||
+      cardData.expiry.length != 4 ||
+      cardData.name.length == 0
+    );
   };
 
   return (
@@ -59,13 +69,14 @@ export default function CreditCardModal() {
           />
 
           <Input
-            type="tel"
+            type="number"
             name="number"
             placeholder="Card Number"
             value={cardData.number}
             onChange={handleInputChange}
             onFocus={handleFocus}
-            maxLength={19}
+            maxLength={16}
+            required
           />
           <Input
             type="text"
@@ -74,6 +85,7 @@ export default function CreditCardModal() {
             value={cardData.name}
             onChange={handleInputChange}
             onFocus={handleFocus}
+            required
           />
           <div className="flex space-x-2 w-full">
             <Input
@@ -84,7 +96,7 @@ export default function CreditCardModal() {
               onChange={handleInputChange}
               onFocus={handleFocus}
               className="w-1/2"
-              maxLength={5}
+              maxLength={4}
             />
             <Input
               type="text"
@@ -94,13 +106,15 @@ export default function CreditCardModal() {
               onChange={handleInputChange}
               onFocus={handleFocus}
               className="w-1/2"
-              maxLength={4}
+              maxLength={3}
             />
           </div>
         </div>
 
         <DialogFooter>
-          <DialogClose onClick={handleSubmit}>Save Card</DialogClose>
+          <DialogClose onClick={handleSubmit} disabled={validation()}>
+            Save Card
+          </DialogClose>
         </DialogFooter>
       </DialogContent>
     </Dialog>

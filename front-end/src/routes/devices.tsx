@@ -525,7 +525,7 @@ function RouteComponent() {
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600">Last Seen</p>
+                      {/* <p className="text-sm text-gray-600">Last Seen</p> */}
                       {/* <p className="font-medium">
                         {formatLastSeen(device.lastSeen)}
                       </p> */}
