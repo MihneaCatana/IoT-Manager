@@ -119,42 +119,26 @@ const otherController = {
 
           if (device.type === "Humidity Sensor") {
             eventMessage = {
-              humidity:
-                device.status !== "offline"
-                  ? parseFloat((Math.random() * 100).toFixed(1))
-                  : 0,
-              powerConsumption:
-                device.status !== "offline"
-                  ? parseFloat(
-                      (Math.random() * (0.002 - 0.001) + 0.001).toFixed(6)
-                    )
-                  : 0,
+              humidity: parseFloat((Math.random() * 100).toFixed(1)),
+              powerConsumption: parseFloat(
+                (Math.random() * (0.002 - 0.001) + 0.001).toFixed(6)
+              ),
             };
           } else if (device.type === "Temperature Sensor") {
             eventMessage = {
-              temperature:
-                device.status !== "offline"
-                  ? parseFloat((Math.random() * (50 - -10) + -10).toFixed(1))
-                  : 0,
-              powerConsumption:
-                device.status !== "offline"
-                  ? parseFloat(
-                      (Math.random() * (0.002 - 0.001) + 0.001).toFixed(6)
-                    )
-                  : 0,
+              temperature: parseFloat(
+                (Math.random() * (50 - -10) + -10).toFixed(1)
+              ),
+              powerConsumption: parseFloat(
+                (Math.random() * (0.002 - 0.001) + 0.001).toFixed(6)
+              ),
             };
           } else if (device.type === "Security Camera") {
             eventMessage = {
-              powerConsumption:
-                device.status !== "offline"
-                  ? parseFloat(
-                      (Math.random() * (0.002 - 0.001) + 0.001).toFixed(6)
-                    )
-                  : 0,
-              battery:
-                device.status !== "offline"
-                  ? parseFloat((Math.random() * 100).toFixed(1))
-                  : 0,
+              powerConsumption: parseFloat(
+                (Math.random() * (0.002 - 0.001) + 0.001).toFixed(6)
+              ),
+              battery: parseFloat((Math.random() * 100).toFixed(1)),
             };
           } else {
             eventMessage = {

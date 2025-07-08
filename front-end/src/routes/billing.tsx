@@ -44,19 +44,10 @@ function RouteComponent() {
     location: "San Francisco, CA",
     profileImage: "/placeholder.svg?height=120&width=120",
   });
-
-  const billingHistory = [
-    {
-      id: "INV-001",
-      date: "2024-06-15",
-      amount: "$29.00",
-      status: "Paid",
-      description: "Premium Plan - Monthly",
-    },
-  ];
+  const [invoices, setInvoice] = useState<any>([]);
 
   const handleDownload = (invoiceData: {
-    id: string;
+    _id: string;
     date: string;
     amount: string;
     status: string;
@@ -79,8 +70,12 @@ function RouteComponent() {
     doc.text("Email: " + profile.email, 20, 48);
 
     // Invoice Info
-    doc.text(`Invoice ID: ${invoiceData.id}`, 140, 30);
-    doc.text(`Date: ${invoiceData.date}`, 140, 36);
+    doc.text(`Invoice ID: ${invoiceData._id}`, 140, 30);
+    doc.text(
+      `Date: ${new Date(invoiceData.date).toLocaleDateString()}`,
+      140,
+      36
+    );
     doc.text(`Status: ${invoiceData.status}`, 140, 42);
 
     // Line separator
@@ -106,7 +101,7 @@ function RouteComponent() {
     doc.setFontSize(10);
     doc.text("Thank you for your business!", 105, 130, { align: "right" });
 
-    doc.save(`${invoiceData.id}.pdf`);
+    doc.save(`${invoiceData._id}.pdf`);
     doc.save("real-pdf.pdf");
   };
 
@@ -119,10 +114,27 @@ function RouteComponent() {
         profileImage: "/placeholder.svg?height=120&width=120",
       });
     });
+
+    axios.get("http://localhost:8080/api/invoice").then((res) => {
+      console.log(res.data);
+      setInvoice(res.data);
+    });
   }, []);
 
   const handleInputChange = (field: keyof UserProfile, value: any) => {
     setProfile((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const createInvoice = () => {
+    axios
+      .post("http://localhost:8080/api/invoice", {
+        amount: "$29.00",
+        status: "Paid",
+        description: "Premium Plan - Monthly",
+      })
+      .then(() => {
+        console.log("Created Invoice");
+      });
   };
 
   const handleSave = () => {
@@ -356,12 +368,14 @@ function RouteComponent() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {billingHistory.map((invoice) => (
-                      <TableRow key={invoice.id}>
+                    {invoices.map((invoice: any) => (
+                      <TableRow key={invoice._id}>
                         <TableCell className="font-medium">
-                          {invoice.id}
+                          {invoice._id}
                         </TableCell>
-                        <TableCell>{invoice.date}</TableCell>
+                        <TableCell>
+                          {new Date(invoice.date).toLocaleDateString()}
+                        </TableCell>
                         <TableCell>{invoice.description}</TableCell>
                         <TableCell>{invoice.amount}</TableCell>
                         <TableCell>
@@ -475,7 +489,14 @@ function RouteComponent() {
                   </p>
                 </CardContent>
                 <CardFooter>
-                  <Button className="w-full">Upgrade to Enterprise</Button>
+                  <a
+                    href="https://iot-website-98rbr01gb-mihneacatanas-projects.vercel.app/contact"
+                    target="_blank"
+                  >
+                    <Button onClick={() => createInvoice()} className="w-full">
+                      Upgrade to Enterprise
+                    </Button>
+                  </a>
                 </CardFooter>
               </Card>
             </div>

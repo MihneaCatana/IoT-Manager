@@ -367,7 +367,12 @@ function RouteComponent() {
                             return (
                               <div key={key}>
                                 <span>{labelMap[key as labelType] || key}</span>
-                                <span>{value as string}</span>
+                                <span>
+                                  {" "}
+                                  {device.status === "offline"
+                                    ? 0
+                                    : (value as string)}
+                                </span>
                               </div>
                             );
                           })}

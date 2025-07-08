@@ -66,12 +66,23 @@ const deviceController = {
       const deviceId = req.params.id;
       const { status, name, temperature, batteryLevel, space } = req.body;
 
-      const device = Device.findOne({ _id: deviceId });
+      const device = await Device.findOne({ _id: deviceId });
 
       if (!device) {
         return res
           .status(404)
           .json({ message: "Device not found or access denied." });
+      }
+
+      if (device.space != space) {
+        const oldSpaceDevice = await Space.findOne({ _id: device.space });
+
+        if (oldSpaceDevice) {
+          oldSpaceDevice.devices = oldSpaceDevice.devices.filter(
+            (device) => device._id != deviceId
+          );
+          await oldSpaceDevice.save();
+        }
       }
 
       const updatedDevice = await Device.findByIdAndUpdate(
@@ -80,13 +91,18 @@ const deviceController = {
         { new: true }
       );
 
-      const spaceDevice = await Space.findOne({ _id: updatedDevice.space });
+      const spaceDevice = await Space.findOne({ _id: space });
 
-      if (spaceDevice) {
-        spaceDevice.devices = spaceDevice.devices.map((device) => {
-          return device._id != deviceId ? device : updatedDevice;
-        });
+      if (spaceDevice && device.space != space) {
+        spaceDevice.devices.push(updatedDevice);
         await spaceDevice.save();
+      } else {
+        if (spaceDevice) {
+          spaceDevice.devices = spaceDevice.devices.map((device) => {
+            return device._id != deviceId ? device : updatedDevice;
+          });
+          await spaceDevice.save();
+        }
       }
 
       res.status(200).json({ device: updatedDevice });

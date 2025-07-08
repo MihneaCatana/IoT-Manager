@@ -517,11 +517,9 @@ function RouteComponent() {
                     <div>
                       <p className="text-sm text-gray-600">Space</p>
                       <p className="font-medium">
-                        {
-                          spaces.filter(
-                            (space: Space) => space._id === device.space
-                          )[0]?.name
-                        }
+                        {spaces.filter(
+                          (space: Space) => space._id === device.space
+                        )[0]?.name || "-"}
                       </p>
                     </div>
                     <div>

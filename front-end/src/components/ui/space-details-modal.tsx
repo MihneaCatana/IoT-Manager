@@ -104,12 +104,33 @@ export function SpaceDetailsModal({
   };
 
   const handleRemoveDevice = (deviceId: string) => {
-    const updatedSpace = {
-      ...spaceData,
-      devices: spaceData.devices.filter((device) => device._id !== deviceId),
-    };
-    setSpaceData(updatedSpace);
-    onUpdateSpace(updatedSpace);
+    console.log("AAAAAAAAA");
+
+    axios
+      .put(`http://localhost:8080/api/device/${deviceId}`, { space: null })
+      .then(() => {
+        const updatedSpace = {
+          ...spaceData,
+          devices: spaceData.devices.filter(
+            (device) => device._id !== deviceId
+          ),
+        };
+        setSpaceData(updatedSpace);
+        onUpdateSpace(updatedSpace);
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Device couldn't be deleted!", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: false,
+          progress: undefined,
+          theme: "light",
+        });
+      });
   };
 
   const handleDeleteSpace = (spaceId: string) => {
